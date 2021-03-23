@@ -15,6 +15,7 @@ var imap = new Imap({
 
 const Digits = [22, 27, 17, 24];
 const Segments = [11, 4, 23, 8, 7, 10, 18];
+const point = new Gpio(25, 'out');
 let digits = [], segments = [];
 let stop = false;
 let number = [0, 0, 0, 0];
@@ -51,6 +52,7 @@ async function display() {
             for (let j = 0; j < 7; j++) {
                 proms.push(segments[j].write(num[n[i]][j]));
             }
+            proms.push(point.write(showDate ? 1 : 0));
             await Promise.all(proms);
             await digits[i].write(0);
             await sleep(1);
