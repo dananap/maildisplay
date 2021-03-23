@@ -26,6 +26,7 @@ namespace display
 {
     using v8::Array;
     using v8::Context;
+    using v8::Exception;
     using v8::Function;
     using v8::FunctionCallbackInfo;
     using v8::FunctionTemplate;
@@ -36,7 +37,6 @@ namespace display
     using v8::ObjectTemplate;
     using v8::String;
     using v8::Value;
-    using v8::Exception;
 
     class Display : public node::ObjectWrap
     {
@@ -67,7 +67,7 @@ namespace display
         }
 
     private:
-        explicit Display(int num) : num_(num)
+        explicit Display(int num) : num_(num), point(25)
         {
             for (int i = 0; i < Digits.size(); i++)
             {
@@ -134,6 +134,8 @@ namespace display
                 return;
             }
 
+            bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(context);
+
             // Perform the operation
             double value = args[0].As<Number>()->Value();
             obj->num_ = (int)value;
@@ -154,6 +156,10 @@ namespace display
                     else
                         obj->segments[j]->off();
                 }
+                if (showPoint)
+                    obj->point.on();
+                else
+                    obj->point.off();
                 obj->digits[i]->off();
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 obj->digits[i]->on();
@@ -168,6 +174,7 @@ namespace display
         array<int, 7> Segments = {11, 4, 23, 8, 7, 10, 18};
         vector<DigitalOut *> segments;
 
+        DigitalOut point;
         int num_;
     };
 

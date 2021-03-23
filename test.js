@@ -1,4 +1,5 @@
-const Display = require('./cpp/build/Release/display');
+const Display = require('./cpp/build/Release/display').Display;
+console.dir(Display);
 const display = new Display(1234);
 let n = 1234;
 
@@ -9,5 +10,5 @@ process.on('SIGTERM', () => {
 });
 
 while(!stop) {
-    display.show(n++);
+    display.show(n++, true);
 }
