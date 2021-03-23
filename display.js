@@ -67,10 +67,12 @@ async function display() {
 
 function cleanup() {
     clearInterval(chkInterval);
-    digits.forEach((led) => led.unexport());
-    segments.forEach((led) => led.writeSync(0));
-    segments.forEach((led) => led.unexport());
-    process.exit();
+    setImmediate(() => {
+        digits.forEach((led) => led.unexport());
+        segments.forEach((led) => led.writeSync(0));
+        segments.forEach((led) => led.unexport());
+        process.exit();
+    });
 }
 
 
