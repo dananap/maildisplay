@@ -148,6 +148,7 @@ async function showCount() {
 
         function parseDate() {
             showDate = true;
+            time.utcOffset(1);
             const min = time.minute();
             const hr = time.hour();
             number[3] = min % 10;
@@ -160,7 +161,7 @@ async function showCount() {
 
 const chkInterval = setInterval(async () => {
     await showCount();
-}, 25000);
+}, 15000);
 
 async function main() {
     digits.forEach((led) => led.writeSync(1));
