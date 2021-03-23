@@ -2,7 +2,10 @@
   "targets": [
     {
       "target_name": "display",
-      "sources": [ "addon.cpp" ]
+      "sources": [ "addon.cpp" ],
+      "libraries": [
+            "-lcppgpio", "-lpthread"
+      ],
     }
   ]
 }

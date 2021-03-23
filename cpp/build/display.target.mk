@@ -128,7 +128,9 @@ LDFLAGS_Release := \
 	-rdynamic \
 	-m64
 
-LIBS :=
+LIBS := \
+	-lcppgpio \
+	-lpthread
 
 $(obj).target/display.node: GYP_LDFLAGS := $(LDFLAGS_$(BUILDTYPE))
 $(obj).target/display.node: LIBS := $(LIBS)
