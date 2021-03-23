@@ -84,7 +84,7 @@ function countUnread() {
             imap.search(['UNSEEN'], function (err, results) {
                 if (err) {
                     console.error(err);
-                    resolve(0);
+                    return resolve(0);
                 }
                 var f = imap.fetch(results, {
                     bodies: 'HEADER.FIELDS (DATE)',
