@@ -136,7 +136,8 @@ async function showCount() {
                 parseCount();
             });
         } else {
-            parseCount();
+            showDate = false;
+            number.fill(0, 0, 3);
         }
 
         function parseCount() {
