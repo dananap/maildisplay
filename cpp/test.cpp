@@ -3,6 +3,7 @@
 #include <cppgpio.hpp>
 #include <array>
 #include <algorithm>
+#include <functional>
 
 using namespace GPIO;
 using namespace std;
@@ -22,24 +23,26 @@ vector<array<bool, 7>> num = {
 int main()
 {
     array<int, 4> Digits = {22, 27, 17, 24};
-    vector<DigitalOut> digits;
+    vector<reference_wrapper<DigitalOut>> digits;
 
     array<int, 7> Segments = {11, 4, 23, 8, 7, 10, 18};
-    vector<DigitalOut> segments;
+    vector<reference_wrapper<DigitalOut>> segments;
 
     for (int i = 0; i < Digits.size(); i++)
     {
-        digits[i] = (DigitalOut(Digits[i]));
-        digits[i].off();
+        DigitalOut out(Digits[i]);
+        digits.push_back(out);
+        digits[i].get().off();
     }
     for (int i = 0; i < Segments.size(); i++)
     {
-        segments[i] = (DigitalOut(Segments[i]));
-        segments[i].off();
+        DigitalOut out(Segments[i]);
+        segments.push_back(out);
+        segments[i].get().off();
     }
 
-    segments[1].on();
-    segments[2].on();
+    segments[1].get().on();
+    segments[2].get().on();
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 
     // std::for_each(Digits.begin(), Digits.end(), [](int n) {
