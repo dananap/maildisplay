@@ -19,21 +19,6 @@ vector<array<bool, 7>> num = {
     {1, 1, 1, 1, 1, 1, 1},
     {1, 1, 1, 1, 0, 1, 1}};
 
-void display()
-{
-    for (int i = 0; i < 4; i++)
-    {
-        // proms.push(digits[i].write(0));
-        for (int j = 0; j < 7; j++)
-        {
-            proms.push(segments[j].write(num[n[i]][j]));
-        }
-
-        await sleep(1);
-        await digits[i].write(1);
-    }
-}
-
 int main()
 {
     array<int, 4> Digits = {22, 27, 17, 24};
