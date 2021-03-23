@@ -30,10 +30,12 @@ int main()
     for (int i = 0; i < Digits.size(); i++)
     {
         digits.push_back(DigitalOut(Digits[i]));
+        digits[i].on();
     }
     for (int i = 0; i < Segments.size(); i++)
     {
         segments.push_back(DigitalOut(Segments[i]));
+        segments[i].off();
     }
     // std::for_each(Digits.begin(), Digits.end(), [](int n) {
     //     digits.push_back(DigitalOut(n));
@@ -53,7 +55,10 @@ int main()
             // proms.push(digits[i].write(0));
             for (int j = 0; j < 7; j++)
             {
-                num[n[i]][j] ? segments[j].on() : segments[j].off();
+                if (num[n[i]][j])
+                    segments[j].on();
+                else
+                    segments[j].off();
             }
             digits[i].off();
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
