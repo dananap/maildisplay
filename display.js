@@ -148,14 +148,14 @@ async function showCount() {
     imap.once('ready', async () => {
         const count = await countUnread();
         if (count === 0) {
+            showDate = false;
+            number.fill(0, 0, 4);
+        } else {
             parseDate();
             sleep(5000).then(() => {
                 showDate = false;
                 parseCount();
             });
-        } else {
-            showDate = false;
-            number.fill(0, 0, 4);
         }
     });
 }
