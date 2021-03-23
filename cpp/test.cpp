@@ -29,12 +29,12 @@ int main()
 
     for (int i = 0; i < Digits.size(); i++)
     {
-        digits.push_back(DigitalOut(Digits[i]));
+        digits[i] = (DigitalOut(Digits[i]));
         digits[i].off();
     }
     for (int i = 0; i < Segments.size(); i++)
     {
-        segments.push_back(DigitalOut(Segments[i]));
+        segments[i] = (DigitalOut(Segments[i]));
         segments[i].off();
     }
 
