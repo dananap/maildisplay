@@ -43,21 +43,20 @@ async function display() {
     const fn = async () => {
         const n = number;
 
-        for (let i = 0; i < n.length; i++) {
+        for (let i = 0; i < 4; i++) {
             let proms = [];
             // proms.push(digits[i].write(0));
             for (let j = 0; j < 7; j++) {
-                proms.push(segments[j].write(num[n[i]][j]));
+                await (segments[j].write(num[n[i]][j]));
+                // proms.push(segments[j].write(num[n[i]][j]));
             }
-            await Promise.all(proms);
+            // await Promise.all(proms);
             await digits[i].write(0);
             await sleep(1);
             await digits[i].write(1);
         }
         if (!stop) {
             setImmediate(fn);
-        } else {
-            cleanup();
         }
     }
     setImmediate(fn);
