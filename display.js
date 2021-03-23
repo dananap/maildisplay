@@ -25,7 +25,7 @@ async function display() {
     const fn = async () => {
         displayObj.show(parseInt(number.join('')), showDate);
         if (!stop) {
-            process.nextTick(fn);
+            setImmediate(fn);
         }
     }
     setImmediate(fn);
