@@ -47,16 +47,15 @@ async function display() {
             let proms = [];
             // proms.push(digits[i].write(0));
             for (let j = 0; j < 7; j++) {
-                await (segments[j].write(num[n[i]][j]));
-                // proms.push(segments[j].write(num[n[i]][j]));
+                proms.push(segments[j].write(num[n[i]][j]));
             }
-            // await Promise.all(proms);
+            await Promise.all(proms);
             await digits[i].write(0);
             await sleep(1);
             await digits[i].write(1);
         }
         if (!stop) {
-            setImmediate(fn);
+            process.nextTick(fn);
         }
     }
     setImmediate(fn);
@@ -132,12 +131,13 @@ async function showCount() {
 
 const chkInterval = setInterval(() => {
     showCount();
-}, 10000);
+}, 30000);
 
 async function main() {
     digits.forEach((led) => led.writeSync(1));
     segments.forEach((led) => led.writeSync(0));
 
+    await showCount();
     sleep(60000).then(() => stop = true);
     await display();
 }
@@ -157,5 +157,11 @@ function sleep(ms) {
         setTimeout(resolve, ms);
     });
 }
+
+process.on('SIGTERM', () => {
+    console.info('SIGTERM signal received.');
+    stop = true;
+    process.nextTick(cleanup);
+});
 
 main();
