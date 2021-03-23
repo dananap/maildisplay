@@ -40,7 +40,7 @@ const num = [
 ];
 
 async function display() {
-    while (!stop) {
+    const fn = async () => {
         const n = number;
 
         for (let i = 0; i < n.length; i++) {
@@ -54,8 +54,13 @@ async function display() {
             await sleep(1);
             digits[i].writeSync(1);
         }
+        if (!stop) {
+            setImmediate(fn);
+        } else {
+            cleanup();
+        }
     }
-    cleanup();
+    setImmediate(fn);
 }
 
 function cleanup() {
