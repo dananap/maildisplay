@@ -16,7 +16,7 @@ const Digits = [22, 27, 17, 24];
 const Segments = [11, 4, 23, 8, 7, 10, 18];
 let digits = [], segments = [];
 let stop = false;
-let number = [1, 2, 3, 4];
+let number = [0, 0, 0, 0];
 
 for (let i of Digits) {
     digits.push(new Gpio(i, 'out'));
@@ -59,6 +59,7 @@ async function display() {
 }
 
 function cleanup() {
+    clearInterval(chkInterval);
     digits.forEach((led) => led.unexport());
     segments.forEach((led) => led.writeSync(0));
     segments.forEach((led) => led.unexport());
@@ -125,14 +126,15 @@ async function showCount() {
     });
 }
 
+const chkInterval = setInterval(() => {
+    showCount();
+}, 10000);
+
 async function main() {
     digits.forEach((led) => led.writeSync(1));
     segments.forEach((led) => led.writeSync(0));
 
-    setInterval(() => {
-        showCount();
-    }, 1000);
-    sleep(15000).then(() => stop = true);
+    sleep(60000).then(() => stop = true);
     await display();
 }
 
