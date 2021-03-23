@@ -1,8 +1,7 @@
-const Gpio = require('onoff').Gpio; //include onoff to interact with the GPIO
 var Imap = require('imap'),
     inspect = require('util').inspect;
 const moment = require('moment');
-const Display = require('./cpp/build/Release/display');
+const Display = require('./cpp/build/Release/display').Display;
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -13,52 +12,18 @@ var imap = new Imap({
     autotls: 'required'
 });
 
-const display = new Display(1234);
+const displayObj = new Display(1234);
 const Digits = [22, 27, 17, 24];
 const Segments = [11, 4, 23, 8, 7, 10, 18];
-const point = new Gpio(25, 'out');
 let digits = [], segments = [];
 let stop = false;
 let number = [0, 0, 0, 0];
 let time = moment(), showDate = false;
 
-for (let i of Digits) {
-    digits.push(new Gpio(i, 'out'));
-}
-
-for (let i of Segments) {
-    segments.push(new Gpio(i, 'out'));
-}
-
-const num = [
-    [1, 1, 1, 1, 1, 1, 0],
-    [0, 1, 1, 0, 0, 0, 0],
-    [1, 1, 0, 1, 1, 0, 1],
-    [1, 1, 1, 1, 0, 0, 1],
-    [0, 1, 1, 0, 0, 1, 1],
-    [1, 0, 1, 1, 0, 1, 1],
-    [1, 0, 1, 1, 1, 1, 1],
-    [1, 1, 1, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 0, 1, 1]
-];
 
 async function display() {
     const fn = async () => {
-        const n = number;
-
-        for (let i = 0; i < 4; i++) {
-            let proms = [];
-            // proms.push(digits[i].write(0));
-            for (let j = 0; j < 7; j++) {
-                proms.push(segments[j].write(num[n[i]][j]));
-            }
-            proms.push(point.write(showDate ? 1 : 0));
-            await Promise.all(proms);
-            await digits[i].write(0);
-            await sleep(1);
-            await digits[i].write(1);
-        }
+        displayObj.show(number.join(''), showDate);
         if (!stop) {
             process.nextTick(fn);
         }
@@ -68,12 +33,6 @@ async function display() {
 
 function cleanup() {
     clearInterval(chkInterval);
-    setImmediate(() => {
-        digits.forEach((led) => led.unexport());
-        segments.forEach((led) => led.writeSync(0));
-        segments.forEach((led) => led.unexport());
-        process.exit();
-    });
 }
 
 
@@ -173,9 +132,6 @@ const chkInterval = setInterval(async () => {
 }, 15000);
 
 async function main() {
-    digits.forEach((led) => led.writeSync(1));
-    segments.forEach((led) => led.writeSync(0));
-
     await showCount();
     await display();
 }
