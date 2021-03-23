@@ -1,0 +1,19 @@
+{
+  "name": "maildisplay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "private": true,
+  "author": {
+    "name": "Daniel Poles",
+    "email": "daniel@dpulm.online"
+  },
+  "dependencies": {
+    "imap": "^0.8.19",
+    "onoff": "^6.0.1"
+  }
+}
