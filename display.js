@@ -23,7 +23,7 @@ let time = moment(), showDate = false;
 
 async function display() {
     const fn = async () => {
-        displayObj.show(number.join(''), showDate);
+        displayObj.show(parseInt(number.join('')), showDate);
         if (!stop) {
             process.nextTick(fn);
         }
