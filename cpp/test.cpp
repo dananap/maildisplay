@@ -30,13 +30,18 @@ int main()
     for (int i = 0; i < Digits.size(); i++)
     {
         digits.push_back(DigitalOut(Digits[i]));
-        digits[i].on();
+        digits[i].off();
     }
     for (int i = 0; i < Segments.size(); i++)
     {
         segments.push_back(DigitalOut(Segments[i]));
         segments[i].off();
     }
+
+    segments[1].on();
+    segments[2].on();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+
     // std::for_each(Digits.begin(), Digits.end(), [](int n) {
     //     digits.push_back(DigitalOut(n));
     // });
