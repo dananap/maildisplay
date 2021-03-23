@@ -1,6 +1,7 @@
 const Gpio = require('onoff').Gpio; //include onoff to interact with the GPIO
 var Imap = require('imap'),
     inspect = require('util').inspect;
+const moment = require('moment');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -17,6 +18,7 @@ const Segments = [11, 4, 23, 8, 7, 10, 18];
 let digits = [], segments = [];
 let stop = false;
 let number = [0, 0, 0, 0];
+let time = moment(), showDate = false;
 
 for (let i of Digits) {
     digits.push(new Gpio(i, 'out'));
@@ -96,6 +98,7 @@ function countUnread() {
                     });
                     msg.once('attributes', function (attrs) {
                         console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+                        time = moment(attrs.date)
                     });
                     msg.once('end', function () {
                         console.log(prefix + 'Finished');
@@ -122,15 +125,25 @@ async function showCount() {
     imap.connect();
     imap.once('ready', async () => {
         const count = await countUnread();
-        number[3] = count % 10;
-        number[2] = Math.floor((count / 10) % 10);
-        number[1] = Math.floor((count / 100) % 10);
-        number[0] = Math.floor((count / 1000) % 10);
+        sleep(10000).then(() => {
+            showDate = false;
+            number[3] = count % 10;
+            number[2] = Math.floor((count / 10) % 10);
+            number[1] = Math.floor((count / 100) % 10);
+            number[0] = Math.floor((count / 1000) % 10);
+        });
+        showDate = true;
+        const min = time.minute();
+        const hr = time.hour();
+        number[3] = min % 10;
+        number[2] = Math.floor((min / 10) % 10);
+        number[1] = hr % 10;
+        number[0] = Math.floor((hr / 10) % 10);
     });
 }
 
-const chkInterval = setInterval(() => {
-    showCount();
+const chkInterval = setInterval(async () => {
+    await showCount();
 }, 30000);
 
 async function main() {
