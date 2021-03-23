@@ -127,20 +127,32 @@ async function showCount() {
     imap.connect();
     imap.once('ready', async () => {
         const count = await countUnread();
-        sleep(10000).then(() => {
-            showDate = false;
+        if (count > 0) {
+            parseDate();
+            sleep(10000).then(() => {
+                showDate = false;
+                parseCount();
+            });
+        } else {
+            parseCount();
+        }
+
+        function parseCount() {
             number[3] = count % 10;
             number[2] = Math.floor((count / 10) % 10);
             number[1] = Math.floor((count / 100) % 10);
             number[0] = Math.floor((count / 1000) % 10);
-        });
-        showDate = true;
-        const min = time.minute();
-        const hr = time.hour();
-        number[3] = min % 10;
-        number[2] = Math.floor((min / 10) % 10);
-        number[1] = hr % 10;
-        number[0] = Math.floor((hr / 10) % 10);
+        }
+
+        function parseDate() {
+            showDate = true;
+            const min = time.minute();
+            const hr = time.hour();
+            number[3] = min % 10;
+            number[2] = Math.floor((min / 10) % 10);
+            number[1] = hr % 10;
+            number[0] = Math.floor((hr / 10) % 10);
+        }
     });
 }
 
@@ -153,7 +165,6 @@ async function main() {
     segments.forEach((led) => led.writeSync(0));
 
     await showCount();
-    sleep(60000).then(() => stop = true);
     await display();
 }
 
