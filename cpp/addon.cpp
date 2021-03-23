@@ -36,6 +36,7 @@ namespace display
     using v8::ObjectTemplate;
     using v8::String;
     using v8::Value;
+    using v8::Exception;
 
     class Display : public node::ObjectWrap
     {
@@ -112,6 +113,30 @@ namespace display
             Isolate *isolate = args.GetIsolate();
 
             Display *obj = ObjectWrap::Unwrap<Display>(args.Holder());
+
+            if (args.Length() < 1)
+            {
+                // Throw an Error that is passed back to JavaScript
+                isolate->ThrowException(Exception::TypeError(
+                    String::NewFromUtf8(isolate,
+                                        "Wrong number of arguments")
+                        .ToLocalChecked()));
+                return;
+            }
+
+            // Check the argument types
+            if (!args[0]->IsNumber())
+            {
+                isolate->ThrowException(Exception::TypeError(
+                    String::NewFromUtf8(isolate,
+                                        "Wrong arguments")
+                        .ToLocalChecked()));
+                return;
+            }
+
+            // Perform the operation
+            double value = args[0].As<Number>()->Value();
+            obj->num_ = (int)value;
 
             int number[] = {1, 2, 3, 4};
             number[3] = (int)obj->num_ % 10;

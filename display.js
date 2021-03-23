@@ -2,6 +2,7 @@ const Gpio = require('onoff').Gpio; //include onoff to interact with the GPIO
 var Imap = require('imap'),
     inspect = require('util').inspect;
 const moment = require('moment');
+const Display = require('./cpp/build/Release/display');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -12,7 +13,7 @@ var imap = new Imap({
     autotls: 'required'
 });
 
-
+const display = new Display(1234);
 const Digits = [22, 27, 17, 24];
 const Segments = [11, 4, 23, 8, 7, 10, 18];
 const point = new Gpio(25, 'out');
