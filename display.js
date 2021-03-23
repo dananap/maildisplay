@@ -45,12 +45,12 @@ async function display() {
 
         for (let i = 0; i < n.length; i++) {
             let proms = [];
-            proms.push(digits[i].write(0));
+            // proms.push(digits[i].write(0));
             for (let j = 0; j < 7; j++) {
                 proms.push(segments[j].write(num[n[i]][j]));
             }
             await Promise.all(proms);
-            // await digits[i].write(0);
+            await digits[i].write(0);
             await sleep(1);
             await digits[i].write(1);
         }
