@@ -154,7 +154,7 @@ async function showCount() {
             parseDate();
             sleep(5000).then(() => {
                 showDate = false;
-                parseCount();
+                parseCount(count);
             });
         }
     });
