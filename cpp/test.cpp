@@ -4,6 +4,7 @@
 #include <array>
 #include <algorithm>
 #include <functional>
+#include <node/node.h>
 
 using namespace GPIO;
 using namespace std;
@@ -22,6 +23,7 @@ vector<array<bool, 7>> num = {
 
 int main()
 {
+    v8
     array<int, 4> Digits = {22, 27, 17, 24};
     vector<DigitalOut*> digits;
 
