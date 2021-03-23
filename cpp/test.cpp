@@ -54,23 +54,23 @@ int main()
     int n[] = {1, 2, 3, 4};
     bool stop = false;
 
-    // while (!stop)
-    // {
-    //     for (int i = 0; i < 4; i++)
-    //     {
-    //         // proms.push(digits[i].write(0));
-    //         for (int j = 0; j < 7; j++)
-    //         {
-    //             if (num[n[i]][j])
-    //                 segments[j].on();
-    //             else
-    //                 segments[j].off();
-    //         }
-    //         digits[i].off();
-    //         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    //         digits[i].on();
-    //     }
-    // }
+    while (!stop)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            // proms.push(digits[i].write(0));
+            for (int j = 0; j < 7; j++)
+            {
+                if (num[n[i]][j])
+                    segments[j]->on();
+                else
+                    segments[j]->off();
+            }
+            digits[i]->off();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            digits[i]->on();
+        }
+    }
 
     return 0;
 }
