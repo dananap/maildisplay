@@ -134,7 +134,7 @@ namespace display
                 return;
             }
 
-            bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(context);
+            bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(isolate);
 
             // Perform the operation
             double value = args[0].As<Number>()->Value();
