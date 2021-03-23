@@ -27,13 +27,21 @@ int main()
     array<int, 7> Segments = {11, 4, 23, 8, 7, 10, 18};
     vector<DigitalOut> segments;
 
-    std::for_each(Digits.begin(), Digits.end(), [](int n) {
-        digits.push_back(DigitalOut(n));
-    });
+    for (int i = 0; i < Digits.size(); i++)
+    {
+        digits.push_back(DigitalOut(Digits[i]));
+    }
+    for (int i = 0; i < Segments.size(); i++)
+    {
+        segments.push_back(DigitalOut(Segments[i]));
+    }
+    // std::for_each(Digits.begin(), Digits.end(), [](int n) {
+    //     digits.push_back(DigitalOut(n));
+    // });
 
-    std::for_each(Segments.begin(), Segments.end(), [](int n) {
-        segments.push_back(DigitalOut(n));
-    });
+    // std::for_each(Segments.begin(), Segments.end(), [](int n) {
+    //     segments.push_back(DigitalOut(n));
+    // });
 
     int n[] = {1, 2, 3, 4};
     bool stop = false;
