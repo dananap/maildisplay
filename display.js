@@ -129,7 +129,7 @@ async function showCount() {
         const count = await countUnread();
         if (count > 0) {
             parseDate();
-            sleep(10000).then(() => {
+            sleep(5000).then(() => {
                 showDate = false;
                 parseCount();
             });
@@ -158,7 +158,7 @@ async function showCount() {
 
 const chkInterval = setInterval(async () => {
     await showCount();
-}, 30000);
+}, 25000);
 
 async function main() {
     digits.forEach((led) => led.writeSync(1));
