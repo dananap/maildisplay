@@ -82,8 +82,8 @@ function countUnread() {
             imap.search(['UNSEEN'], function (err, results) {
                 if (err) throw err;
                 var f = imap.fetch(results, {
-                    bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
-                    struct: true
+                    bodies: 'HEADER.FIELDS (DATE)',
+                    struct: false
                 });
                 f.on('message', function (msg, seqno) {
                     count++;
