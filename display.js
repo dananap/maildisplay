@@ -86,39 +86,44 @@ function countUnread() {
                     console.error(err);
                     return resolve(0);
                 }
-                var f = imap.fetch(results, {
-                    bodies: 'HEADER.FIELDS (DATE)',
-                    struct: false
-                });
-                f.on('message', function (msg, seqno) {
-                    count++;
-                    console.log('Message #%d', seqno);
-                    var prefix = '(#' + seqno + ') ';
-                    msg.on('body', function (stream, info) {
-                        var buffer = '';
-                        stream.on('data', function (chunk) {
-                            buffer += chunk.toString('utf8');
+                try {
+                    var f = imap.fetch(results, {
+                        bodies: 'HEADER.FIELDS (DATE)',
+                        struct: false
+                    });
+                    f.on('message', function (msg, seqno) {
+                        count++;
+                        console.log('Message #%d', seqno);
+                        var prefix = '(#' + seqno + ') ';
+                        msg.on('body', function (stream, info) {
+                            var buffer = '';
+                            stream.on('data', function (chunk) {
+                                buffer += chunk.toString('utf8');
+                            });
+                            stream.once('end', function () {
+                                console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+                            });
                         });
-                        stream.once('end', function () {
-                            console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+                        msg.once('attributes', function (attrs) {
+                            console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+                            time = moment(attrs.date)
+                        });
+                        msg.once('end', function () {
+                            console.log(prefix + 'Finished');
                         });
                     });
-                    msg.once('attributes', function (attrs) {
-                        console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
-                        time = moment(attrs.date)
+                    f.once('error', function (err) {
+                        console.log('Fetch error: ' + err);
                     });
-                    msg.once('end', function () {
-                        console.log(prefix + 'Finished');
+                    f.once('end', function () {
+                        console.log('Done fetching all messages!');
+                        imap.end();
+                        resolve(count);
                     });
-                });
-                f.once('error', function (err) {
-                    console.log('Fetch error: ' + err);
-                });
-                f.once('end', function () {
-                    console.log('Done fetching all messages!');
-                    imap.end();
-                    resolve(count);
-                });
+                } catch (err) {
+                    console.error(err);
+                    return resolve(0);
+                }
             });
         });
     });
