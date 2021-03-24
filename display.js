@@ -18,7 +18,10 @@ const displayObj = new Display(1234);
 
 const bot = new Bot();
 let cmd = ['mails'];
-bot.on('cmd', (cmd_) => cmd = cmd_.split(' '));
+bot.on('cmd', (cmd_) => {
+    cmd = cmd_.split(' ');
+    priceAge = moment().subtract(60, 'seconds');
+});
 
 let stop = false;
 let number = 0000;
