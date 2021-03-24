@@ -102,26 +102,26 @@ function parseDate() {
     time.utcOffset(1);
     const min = time.minute();
     const hr = time.hour();
-    number = parseInt('' + min % 10 + Math.floor((min / 10) % 10) + hr % 10 + Math.floor((hr / 10) % 10));
+    number = parseInt('' + Math.floor((hr / 10) % 10) + hr % 10 + Math.floor((min / 10) % 10) + min % 10);
 }
 
 function showMailCount() {
     return new Promise((resolve) => {
-    imap.connect();
-    imap.once('ready', async () => {
-        const count = await countUnread();
-        resolve();
-        if (count === 0) {
-            number = 0;
-        } else {
-            parseDate();
-            sleep(5000).then(() => {
-                showDate = false;
-                number = count;
-            });
-        }
+        imap.connect();
+        imap.once('ready', async () => {
+            const count = await countUnread();
+            resolve();
+            if (count === 0) {
+                number = 0;
+            } else {
+                parseDate();
+                sleep(5000).then(() => {
+                    showDate = false;
+                    number = count;
+                });
+            }
+        });
     });
-});
 }
 
 const chkInterval = setInterval(async () => {
@@ -141,7 +141,7 @@ const chkInterval = setInterval(async () => {
         case 'covid':
             if (moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getCovidData(cmd[1], cmd[2]));
-            if(number >= 10000) {
+            if (number >= 10000) {
                 showK = true;
             } else {
                 showK = false;
