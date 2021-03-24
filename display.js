@@ -17,7 +17,6 @@ var imap = new Imap({
 });
 
 const worker = new Worker('./worker.js');
-const subChannel = new MessageChannel();
 
 const bot = new Bot();
 let cmd = ['mails'];
@@ -106,10 +105,12 @@ function parseDate() {
     number = parseInt('' + min % 10 + Math.floor((min / 10) % 10) + hr % 10 + Math.floor((hr / 10) % 10));
 }
 
-async function showMailCount() {
+function showMailCount() {
+    return new Promise((resolve) => {
     imap.connect();
     imap.once('ready', async () => {
         const count = await countUnread();
+        resolve();
         if (count === 0) {
             number = 0;
         } else {
@@ -120,6 +121,7 @@ async function showMailCount() {
             });
         }
     });
+});
 }
 
 const chkInterval = setInterval(async () => {
@@ -152,7 +154,7 @@ const chkInterval = setInterval(async () => {
             break;
     }
     sendData();
-}, 15000);
+}, 25000);
 
 async function main() {
     sendData();
