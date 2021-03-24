@@ -18,10 +18,10 @@ parentPort.once('message', (value) => {
         showDate = data[1] || 0;
         showK = data[2] || 0;
     });
-    display();
+    run();
 });
 
-async function display() {
+async function run() {
     const fn = async () => {
         displayObj.show(number, showDate);
         if (!stop) {
