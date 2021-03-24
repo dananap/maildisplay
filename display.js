@@ -28,18 +28,13 @@ let number = 0000;
 let time = moment(), showDate = false;
 let priceAge = moment().subtract(60, 'seconds');
 
-async function display() {
-    const fn = async () => {
-        displayObj.show(number, showDate);
-        if (!stop) {
-            setImmediate(fn);
-        }
-    }
-    setImmediate(fn);
+function sendData() {
+    subChannel.port1.postMessage([number, showDate, showK]);
 }
 
 function cleanup() {
     clearInterval(chkInterval);
+    subChannel.port1.postMessage(null);
 }
 
 
@@ -126,7 +121,6 @@ async function showMailCount() {
 
 const chkInterval = setInterval(async () => {
     switch (cmd[0]) {
-
         case 'price':
             if(moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getCryptoPrice(cmd[1] || undefined));
@@ -141,10 +135,11 @@ const chkInterval = setInterval(async () => {
             await showMailCount();
             break;
     }
+    sendData();
 }, 15000);
 
 async function main() {
-    await display();
+    worker.postMessage({ port: subChannel.port1 }, [subChannel.port1]);
 }
 
 imap.once('error', function (err) {
