@@ -29,7 +29,7 @@ async function run() {
     const fn = async () => {
         display.show(number, showDate, showK);
         if (!stop) {
-            process.nextTick(fn);
+            setImmediate(fn);
         }
     }
     setImmediate(fn);
