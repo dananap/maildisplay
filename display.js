@@ -173,7 +173,7 @@ async function getCryptoPrice(id = 'ethereum') {
 async function getIntradayData(symbol) {
     const req = await axios.get('https://www.alphavantage.co/query', {
         params: {
-            function: 'TIME_SERIES_DAILY',
+            function: 'TIME_SERIES_INTRADAY',
             symbol,
             apikey: '3IFWTOJ46GQ5DIWR',
             // outputsize: "full",
