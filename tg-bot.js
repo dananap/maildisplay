@@ -36,7 +36,7 @@ async function getUpdates() {
 }
 
 async function getCryptoPrice(id = 'ethereum') {
-    const {data} = axios.get('https://api.coingecko.com/api/v3/simple/price', {
+    const {data} = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
         params: {
             vs_currencies: 'eur',
             ids: id
