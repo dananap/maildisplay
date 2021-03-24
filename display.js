@@ -139,8 +139,8 @@ const chkInterval = setInterval(async () => {
             parseCount(price);
             break;
         case 'stock':
-            const price = Math.floor(await getIntradayData(cmd[1]));
-            parseCount(price);
+            const stockPrice = Math.floor(await getIntradayData(cmd[1]));
+            parseCount(stockPrice);
             break;
         default:
             await showMailCount();
