@@ -2,6 +2,8 @@ var Imap = require('imap'),
     inspect = require('util').inspect;
 const moment = require('moment');
 const Display = require('./cpp/build/Release/display').Display;
+const axios = require('axios').default;
+const Bot = require('./tg-bot');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -13,9 +15,11 @@ var imap = new Imap({
 });
 
 const displayObj = new Display(1234);
-const Digits = [22, 27, 17, 24];
-const Segments = [11, 4, 23, 8, 7, 10, 18];
-let digits = [], segments = [];
+
+const bot = new Bot();
+let cmd = ['mails'];
+bot.addListener('cmd', (cmd_) => cmd = cmd_);
+
 let stop = false;
 let number = [0, 0, 0, 0];
 let time = moment(), showDate = false;
@@ -111,7 +115,7 @@ function parseDate() {
     number[0] = Math.floor((hr / 10) % 10);
 }
 
-async function showCount() {
+async function showMailCount() {
     imap.connect();
     imap.once('ready', async () => {
         const count = await countUnread();
@@ -128,7 +132,15 @@ async function showCount() {
 }
 
 const chkInterval = setInterval(async () => {
-    await showCount();
+    switch (cmd[0]) {
+        case 'mails':
+            await showMailCount();
+            break;
+        case 'price':
+            const price = Math.floor(await getCryptoPrice(cmd[1] || undefined));
+            parseCount(price);
+            break;
+    }
 }, 15000);
 
 async function main() {
@@ -150,6 +162,16 @@ function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
+}
+
+async function getCryptoPrice(id = 'ethereum') {
+    const { data } = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+        params: {
+            vs_currencies: 'eur',
+            ids: id
+        }
+    });
+    return data[id].eur;
 }
 
 process.on('SIGTERM', () => {
