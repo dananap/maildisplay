@@ -35,8 +35,19 @@ async function getUpdates() {
     await setAsync('tg.offset', offset);
 }
 
+async function getCryptoPrice(id = 'ethereum') {
+    const {data} = axios.get('https://api.coingecko.com/api/v3/simple/price', {
+        params: {
+            vs_currencies: 'eur',
+            ids: id
+        }
+    });
+    return data[id].eur;
+}
+
 async function main() {
     let run = 1;
+    console.log(await getCryptoPrice());
     while(run) {
         await getUpdates();
         await sleep(1000);
