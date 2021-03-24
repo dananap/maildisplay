@@ -16,7 +16,7 @@ var imap = new Imap({
     autotls: 'required'
 });
 
-const worker = new Worker('worker.js');
+const worker = new Worker('./worker.js');
 const subChannel = new MessageChannel();
 
 const bot = new Bot();
