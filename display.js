@@ -21,13 +21,13 @@ let cmd = ['mails'];
 bot.on('cmd', (cmd_) => cmd = cmd_.split(' '));
 
 let stop = false;
-let number = [0, 0, 0, 0];
+let number = 0000;
 let time = moment(), showDate = false;
 
 
 async function display() {
     const fn = async () => {
-        displayObj.show(parseInt(number.join('')), showDate);
+        displayObj.show(number, showDate);
         if (!stop) {
             setImmediate(fn);
         }
@@ -97,22 +97,12 @@ function openInbox(cb) {
     imap.openBox('INBOX', true, cb);
 }
 
-function parseCount(count) {
-    number[3] = count % 10;
-    number[2] = Math.floor((count / 10) % 10);
-    number[1] = Math.floor((count / 100) % 10);
-    number[0] = Math.floor((count / 1000) % 10);
-}
-
 function parseDate() {
     showDate = true;
     time.utcOffset(1);
     const min = time.minute();
     const hr = time.hour();
-    number[3] = min % 10;
-    number[2] = Math.floor((min / 10) % 10);
-    number[1] = hr % 10;
-    number[0] = Math.floor((hr / 10) % 10);
+    number = parseInt('' + min % 10 + Math.floor((min / 10) % 10) + hr % 10 + Math.floor((hr / 10) % 10));
 }
 
 async function showMailCount() {
@@ -120,12 +110,12 @@ async function showMailCount() {
     imap.once('ready', async () => {
         const count = await countUnread();
         if (count === 0) {
-            number = [0, 0, 0, 0];
+            number = 0;
         } else {
             parseDate();
             sleep(5000).then(() => {
                 showDate = false;
-                parseCount(count);
+                number = count;
             });
         }
     });
@@ -135,12 +125,10 @@ const chkInterval = setInterval(async () => {
     switch (cmd[0]) {
 
         case 'price':
-            const price = Math.floor(await getCryptoPrice(cmd[1] || undefined));
-            parseCount(price);
+            number = Math.floor(await getCryptoPrice(cmd[1] || undefined));
             break;
         case 'stock':
-            const stockPrice = Math.floor(await getIntradayData(cmd[1]));
-            parseCount(stockPrice);
+            number = Math.floor(await getIntradayData(cmd[1]));
             break;
         default:
             await showMailCount();
