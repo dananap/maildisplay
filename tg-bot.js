@@ -31,7 +31,6 @@ class Bot extends EventEmitter {
             }
         });
         const { data } = res;
-        console.dir(data);
     
         for(let u of data.result) {
             offset = Math.max(offset, u.update_id+1);
@@ -39,11 +38,7 @@ class Bot extends EventEmitter {
             if(u.message) {
                 const {text, from} = u.message;
                 console.log({text, from});
-                const cmd = text.split(' ');
                 this.emit('cmd', text);
-                if(cmd[0] === 'price') {
-                    console.log(await getCryptoPrice(cmd[1] || undefined));
-                }
             }
         }
         await setAsync('tg.offset', offset);
