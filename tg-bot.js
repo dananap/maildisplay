@@ -31,6 +31,7 @@ class Bot extends EventEmitter {
             }
         });
         const { data } = res;
+        console.dir(data);
     
         for(let u of data.result) {
             offset = Math.max(offset, u.update_id+1);

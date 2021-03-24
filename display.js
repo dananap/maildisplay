@@ -18,7 +18,7 @@ const displayObj = new Display(1234);
 
 const bot = new Bot();
 let cmd = ['mails'];
-bot.addListener('cmd', (cmd_) => cmd = cmd_.split(' '));
+bot.on('cmd', (cmd_) => cmd = cmd_.split(' '));
 
 let stop = false;
 let number = [0, 0, 0, 0];
