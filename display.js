@@ -32,12 +32,12 @@ let time = moment(), showDate = false, showK = false;
 let priceAge = moment().subtract(60, 'seconds');
 
 function sendData() {
-    subChannel.port1.postMessage([number, showDate, showK]);
+    worker.postMessage([number, showDate, showK]);
 }
 
 function cleanup() {
     clearInterval(chkInterval);
-    subChannel.port1.postMessage(null);
+    worker.postMessage(null);
 }
 
 
@@ -155,7 +155,7 @@ const chkInterval = setInterval(async () => {
 }, 15000);
 
 async function main() {
-    worker.postMessage({ port: subChannel.port1 }, [subChannel.port1]);
+    sendData();
 }
 
 imap.once('error', function (err) {
