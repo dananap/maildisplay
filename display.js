@@ -2,6 +2,8 @@ var Imap = require('imap'),
     inspect = require('util').inspect;
 const moment = require('moment');
 const Display = require('./cpp/build/Release/display').Display;
+const axios = require('axios').default;
+const Bot = require('./tg-bot');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -13,17 +15,22 @@ var imap = new Imap({
 });
 
 const displayObj = new Display(1234);
-const Digits = [22, 27, 17, 24];
-const Segments = [11, 4, 23, 8, 7, 10, 18];
-let digits = [], segments = [];
-let stop = false;
-let number = [0, 0, 0, 0];
-let time = moment(), showDate = false;
 
+const bot = new Bot();
+let cmd = ['mails'];
+bot.on('cmd', (cmd_) => {
+    cmd = cmd_.split(' ');
+    priceAge = moment().subtract(60, 'seconds');
+});
+
+let stop = false;
+let number = 0000;
+let time = moment(), showDate = false, showK = false;
+let priceAge = moment().subtract(60, 'seconds');
 
 async function display() {
     const fn = async () => {
-        displayObj.show(parseInt(number.join('')), showDate);
+        displayObj.show(number, showDate, showK);
         if (!stop) {
             setImmediate(fn);
         }
@@ -93,46 +100,63 @@ function openInbox(cb) {
     imap.openBox('INBOX', true, cb);
 }
 
-function parseCount(count) {
-    number[3] = count % 10;
-    number[2] = Math.floor((count / 10) % 10);
-    number[1] = Math.floor((count / 100) % 10);
-    number[0] = Math.floor((count / 1000) % 10);
-}
-
 function parseDate() {
     showDate = true;
     time.utcOffset(1);
     const min = time.minute();
     const hr = time.hour();
-    number[3] = min % 10;
-    number[2] = Math.floor((min / 10) % 10);
-    number[1] = hr % 10;
-    number[0] = Math.floor((hr / 10) % 10);
+    number = parseInt('' + min % 10 + Math.floor((min / 10) % 10) + hr % 10 + Math.floor((hr / 10) % 10));
 }
 
-async function showCount() {
+async function showMailCount() {
     imap.connect();
     imap.once('ready', async () => {
         const count = await countUnread();
         if (count === 0) {
-            number = [0, 0, 0, 0];
+            number = 0;
         } else {
             parseDate();
             sleep(5000).then(() => {
                 showDate = false;
-                parseCount(count);
+                number = count;
             });
         }
     });
 }
 
 const chkInterval = setInterval(async () => {
-    await showCount();
+    switch (cmd[0]) {
+
+        case 'price':
+            if (moment().diff(priceAge, 'seconds') < 60) break;
+            number = Math.floor(await getCryptoPrice(cmd[1] || undefined));
+            showK = false;
+            priceAge = moment();
+            break;
+        case 'stock':
+            if (moment().diff(priceAge, 'seconds') < 60) break;
+            number = Math.floor(await getIntradayData(cmd[1]));
+            showK = false;
+            priceAge = moment();
+            break;
+        case 'covid':
+            if (moment().diff(priceAge, 'seconds') < 60) break;
+            number = Math.floor(await getCovidData(cmd[1], cmd[2]));
+            if(number >= 10000) {
+                showK = true;
+            } else {
+                showK = false;
+            }
+            priceAge = moment();
+            break;
+        default:
+            showK = false;
+            await showMailCount();
+            break;
+    }
 }, 15000);
 
 async function main() {
-    await showCount();
     await display();
 }
 
@@ -150,6 +174,55 @@ function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
+}
+
+async function getCryptoPrice(id = 'ethereum') {
+    const { data } = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+        params: {
+            vs_currencies: 'eur',
+            ids: id
+        }
+    });
+    return data[id].eur;
+}
+
+async function getIntradayData(symbol) {
+    const req = await axios.get('https://www.alphavantage.co/query', {
+        params: {
+            function: 'TIME_SERIES_INTRADAY',
+            symbol,
+            apikey: '3IFWTOJ46GQ5DIWR',
+            // outputsize: "full",
+            interval: '1min'
+        }
+    });
+
+    const timeSeries = Object.values(req.data)[1];
+    let timeArray = [];
+
+    for (const [key, value] of Object.entries(timeSeries)) {
+        const values = Object.values(value);
+        let entry = {
+            time: moment(key).utcOffset(-5).toDate(),
+            open: parseFloat(values[0]),
+            high: parseFloat(values[1]),
+            low: parseFloat(values[2]),
+            close: parseFloat(values[3]),
+            volume: parseFloat(values[4]),
+            symbol,
+        }
+        timeArray.push(entry);
+    }
+
+    return timeArray[0].close;
+}
+
+async function getCovidData(metric = 'new_cases', country = 'DEU') {
+    const req = await axios.get('https://github.com/owid/covid-19-data/raw/master/public/data/latest/owid-covid-latest.json');
+
+    const metrics = req.data[country];
+
+    return metrics[metric];
 }
 
 process.on('SIGTERM', () => {
