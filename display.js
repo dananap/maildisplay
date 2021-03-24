@@ -140,7 +140,7 @@ const chkInterval = setInterval(async () => {
             if (moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getCovidData(cmd[1], cmd[2]));
             if(number >= 10000) {
-                number /= 1000;
+                number = Math.floor(number/1000);
                 showK = true;
             } else {
                 showK = false;
