@@ -30,6 +30,10 @@ async function getUpdates() {
         if(u.message) {
             const {text, from} = u.message;
             console.log({text, from});
+            const cmd = text.split(' ');
+            if(cmd[0] === 'price') {
+                console.log(await getCryptoPrice(cmd[1] || undefined));
+            }
         }
     }
     await setAsync('tg.offset', offset);
