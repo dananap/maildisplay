@@ -22,12 +22,12 @@ bot.on('cmd', (cmd_) => cmd = cmd_.split(' '));
 
 let stop = false;
 let number = 0000;
-let time = moment(), showDate = false;
+let time = moment(), showDate = false, showK = false;
 let priceAge = moment().subtract(60, 'seconds');
 
 async function display() {
     const fn = async () => {
-        displayObj.show(number, showDate);
+        displayObj.show(number, showDate, showK);
         if (!stop) {
             setImmediate(fn);
         }
@@ -125,16 +125,30 @@ const chkInterval = setInterval(async () => {
     switch (cmd[0]) {
 
         case 'price':
-            if(moment().diff(priceAge, 'seconds') < 60) break;
+            if (moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getCryptoPrice(cmd[1] || undefined));
+            showK = false;
             priceAge = moment();
             break;
         case 'stock':
-            if(moment().diff(priceAge, 'seconds') < 60) break;
+            if (moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getIntradayData(cmd[1]));
+            showK = false;
+            priceAge = moment();
+            break;
+        case 'covid':
+            if (moment().diff(priceAge, 'seconds') < 60) break;
+            number = Math.floor(await getCovidData(cmd[1], cmd[2]));
+            if(number >= 10000) {
+                number /= 1000;
+                showK = true;
+            } else {
+                showK = false;
+            }
             priceAge = moment();
             break;
         default:
+            showK = false;
             await showMailCount();
             break;
     }
@@ -199,6 +213,14 @@ async function getIntradayData(symbol) {
     }
 
     return timeArray[0].close;
+}
+
+async function getCovidData(metric = 'new_cases', country = 'DEU') {
+    const req = await axios.get('https://github.com/owid/covid-19-data/raw/master/public/data/latest/owid-covid-latest.json');
+
+    const metrics = req.data[country];
+
+    return metrics[metric];
 }
 
 process.on('SIGTERM', () => {
