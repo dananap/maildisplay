@@ -15,21 +15,24 @@ client.on("error", function (error) {
 });
 
 async function getUpdates() {
+    let offset = (await getAsync('tg.offset')) || 0;
+
     const res = await api('/getUpdates', {
         params: {
-            offset: (await getAsync('tg.offset')) || 0
+            offset
         }
     });
     const { data } = res;
 
-    for(let u of data) {
+    for(let u of data.result) {
+        offset = Math.max(offset, u.update_id+1);
         client.lpush('tg.updates', JSON.stringify(u));
         if(u.message) {
             const {text, from} = u.message;
             console.log({text, from});
         }
     }
-
+    await setAsync('tg.offset', offset);
 }
 
 async function main() {
