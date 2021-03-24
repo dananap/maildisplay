@@ -23,7 +23,7 @@ parentPort.once('message', (value) => {
 
 async function run() {
     const fn = async () => {
-        display.show(number, showDate);
+        display.show(number, showDate, showK);
         if (!stop) {
             setImmediate(fn);
         }
