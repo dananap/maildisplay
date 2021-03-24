@@ -133,12 +133,17 @@ async function showMailCount() {
 
 const chkInterval = setInterval(async () => {
     switch (cmd[0]) {
-        case 'mails':
-            await showMailCount();
-            break;
+
         case 'price':
             const price = Math.floor(await getCryptoPrice(cmd[1] || undefined));
             parseCount(price);
+            break;
+        case 'stock':
+            const price = Math.floor(await getIntradayData(cmd[1]));
+            parseCount(price);
+            break;
+        default:
+            await showMailCount();
             break;
     }
 }, 15000);
@@ -171,6 +176,37 @@ async function getCryptoPrice(id = 'ethereum') {
         }
     });
     return data[id].eur;
+}
+
+async function getIntradayData(symbol) {
+    const req = await axios.get('https://www.alphavantage.co/query', {
+        params: {
+            function: 'TIME_SERIES_DAILY',
+            symbol,
+            apikey: '3IFWTOJ46GQ5DIWR',
+            // outputsize: "full",
+            interval: '1min'
+        }
+    });
+
+    const timeSeries = Object.values(req.data)[1];
+    let timeArray = [];
+
+    for (const [key, value] of Object.entries(timeSeries)) {
+        const values = Object.values(value);
+        let entry = {
+            time: moment(key).utcOffset(-5).toDate(),
+            open: parseFloat(values[0]),
+            high: parseFloat(values[1]),
+            low: parseFloat(values[2]),
+            close: parseFloat(values[3]),
+            volume: parseFloat(values[4]),
+            symbol,
+        }
+        timeArray.push(entry);
+    }
+
+    return timeArray[0].close;
 }
 
 process.on('SIGTERM', () => {
