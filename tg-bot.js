@@ -19,7 +19,7 @@ class Bot extends EventEmitter {
     constructor(time = 5000) {
         super();
         this.time = time;
-        this.timeout = setInterval(async () => {await this.getUpdates()}, time);
+        // this.timeout = setInterval(async () => {await this.getUpdates()}, time);
     }
 
     async getUpdates() {

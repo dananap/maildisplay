@@ -19,6 +19,7 @@ const displayObj = new Display(1234);
 const bot = new Bot();
 let cmd = ['mails'];
 bot.on('cmd', (cmd_) => cmd = cmd_.split(' '));
+setInterval(async () => {await bot.getUpdates()}, 10000);
 
 let stop = false;
 let number = [0, 0, 0, 0];
