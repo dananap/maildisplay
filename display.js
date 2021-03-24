@@ -1,9 +1,11 @@
 var Imap = require('imap'),
     inspect = require('util').inspect;
 const moment = require('moment');
-const Display = require('./cpp/build/Release/display').Display;
 const axios = require('axios').default;
 const Bot = require('./tg-bot');
+const {
+    Worker, MessageChannel, MessagePort, isMainThread, parentPort
+} = require('worker_threads');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -14,7 +16,8 @@ var imap = new Imap({
     autotls: 'required'
 });
 
-const displayObj = new Display(1234);
+const worker = new Worker(__filename);
+const subChannel = new MessageChannel();
 
 const bot = new Bot();
 let cmd = ['mails'];
@@ -171,6 +174,37 @@ async function getCryptoPrice(id = 'ethereum') {
 }
 
 async function getIntradayData(symbol) {
+    const req = await axios.get('https://www.alphavantage.co/query', {
+        params: {
+            function: 'TIME_SERIES_INTRADAY',
+            symbol,
+            apikey: '3IFWTOJ46GQ5DIWR',
+            // outputsize: "full",
+            interval: '1min'
+        }
+    });
+
+    const timeSeries = Object.values(req.data)[1];
+    let timeArray = [];
+
+    for (const [key, value] of Object.entries(timeSeries)) {
+        const values = Object.values(value);
+        let entry = {
+            time: moment(key).utcOffset(-5).toDate(),
+            open: parseFloat(values[0]),
+            high: parseFloat(values[1]),
+            low: parseFloat(values[2]),
+            close: parseFloat(values[3]),
+            volume: parseFloat(values[4]),
+            symbol,
+        }
+        timeArray.push(entry);
+    }
+
+    return timeArray[0].close;
+}
+
+async function getCovidData(metric = '') {
     const req = await axios.get('https://www.alphavantage.co/query', {
         params: {
             function: 'TIME_SERIES_INTRADAY',
