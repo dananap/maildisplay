@@ -39,7 +39,7 @@ class Bot extends EventEmitter {
                 const {text, from} = u.message;
                 console.log({text, from});
                 const cmd = text.split(' ');
-                this.emit('cmd', cmd);
+                this.emit('cmd', text);
                 if(cmd[0] === 'price') {
                     console.log(await getCryptoPrice(cmd[1] || undefined));
                 }
