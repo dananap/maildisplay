@@ -18,9 +18,7 @@ client.on("error", function (error) {
 class Bot extends EventEmitter {
     constructor(time = 1000) {
         super();
-        this.interval = setInterval(async () => {
-            getUpdates();
-        }, time);
+        this.interval = setInterval(this.getUpdates, time);
     }
 
     async getUpdates() {
