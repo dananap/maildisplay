@@ -20,7 +20,9 @@ vector<array<bool, 7>> nums = {
     {1, 0, 1, 1, 1, 1, 1},
     {1, 1, 1, 0, 0, 0, 0},
     {1, 1, 1, 1, 1, 1, 1},
-    {1, 1, 1, 1, 0, 1, 1}};
+    {1, 1, 1, 1, 0, 1, 1},
+    {1, 0, 1, 0, 1, 1, 1},
+    };
 
 namespace display
 {
@@ -135,17 +137,25 @@ namespace display
             }
 
             bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(isolate);
+            bool showK = args[2]->IsUndefined() ? 0 : args[2]->BooleanValue(isolate);
 
             // Perform the operation
             double value = args[0].As<Number>()->Value();
             obj->num_ = (int)value;
 
             int number[] = {1, 2, 3, 4};
-            number[3] = (int)obj->num_ % 10;
-            number[2] = (int)((obj->num_ / 10) % 10);
-            number[1] = (int)((obj->num_ / 100) % 10);
-            number[0] = (int)((obj->num_ / 1000) % 10);
 
+            if(showK) {
+                number[3] = 10;
+                number[2] = (int)((obj->num_ / 1000) % 10);
+                number[1] = (int)((obj->num_ / 10000) % 10);
+                number[0] = (int)((obj->num_ / 100000) % 10);
+            } else {
+                number[3] = (int)obj->num_ % 10;
+                number[2] = (int)((obj->num_ / 10) % 10);
+                number[1] = (int)((obj->num_ / 100) % 10);
+                number[0] = (int)((obj->num_ / 1000) % 10);
+            }
             for (int i = 0; i < 4; i++)
             {
                 // proms.push(digits[i].write(0));
