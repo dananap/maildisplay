@@ -23,7 +23,7 @@ bot.on('cmd', (cmd_) => cmd = cmd_.split(' '));
 let stop = false;
 let number = 0000;
 let time = moment(), showDate = false;
-
+let priceAge = moment().subtract(60, 'seconds');
 
 async function display() {
     const fn = async () => {
@@ -125,10 +125,14 @@ const chkInterval = setInterval(async () => {
     switch (cmd[0]) {
 
         case 'price':
+            if(moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getCryptoPrice(cmd[1] || undefined));
+            priceAge = moment();
             break;
         case 'stock':
+            if(moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getIntradayData(cmd[1]));
+            priceAge = moment();
             break;
         default:
             await showMailCount();
