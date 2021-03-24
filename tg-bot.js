@@ -18,7 +18,8 @@ client.on("error", function (error) {
 class Bot extends EventEmitter {
     constructor(time = 1000) {
         super();
-        this.interval = setInterval(this.getUpdates, time);
+        this.time = time;
+        this.timeout = setTimeout(this.getUpdates, time);
     }
 
     async getUpdates() {
@@ -45,6 +46,7 @@ class Bot extends EventEmitter {
             }
         }
         await setAsync('tg.offset', offset);
+        this.timeout = setTimeout(this.getUpdates, this.time);
     }
 
 }
