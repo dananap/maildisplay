@@ -126,7 +126,7 @@ function reconnectImap() {
 }
 
 const chkInterval = setInterval(async () => {
-    switch (cmd[0]) {
+    switch (cmd[0].toLowerCase()) {
         case 'price':
             if (moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getCryptoPrice(cmd[1] || undefined));
