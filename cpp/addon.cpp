@@ -69,7 +69,7 @@ namespace display
         }
 
     private:
-        explicit Display(int num) : num_(num), point(25)
+        explicit Display() : point(25)
         {
             for (int i = 0; i < Digits.size(); i++)
             {
@@ -92,20 +92,16 @@ namespace display
             if (args.IsConstructCall())
             {
                 // Invoked as constructor: `new Display(...)`
-                int value = args[0]->IsUndefined() ? 0 : (int)args[0]->NumberValue(context).FromMaybe(0);
-                Display *obj = new Display(value);
+                Display *obj = new Display();
                 obj->Wrap(args.This());
                 args.GetReturnValue().Set(args.This());
             }
             else
             {
-                // Invoked as plain function `Display(...)`, turn into construct call.
-                const int argc = 1;
-                Local<Value> argv[argc] = {args[0]};
                 Local<Function> cons =
                     args.Data().As<Object>()->GetInternalField(0).As<Function>();
                 Local<Object> result =
-                    cons->NewInstance(context, argc, argv).ToLocalChecked();
+                    cons->NewInstance(context).ToLocalChecked();
                 args.GetReturnValue().Set(result);
             }
         }
@@ -116,32 +112,12 @@ namespace display
 
             Display *obj = ObjectWrap::Unwrap<Display>(args.Holder());
 
-            if (args.Length() < 1)
-            {
-                // Throw an Error that is passed back to JavaScript
-                isolate->ThrowException(Exception::TypeError(
-                    String::NewFromUtf8(isolate,
-                                        "Wrong number of arguments")
-                        .ToLocalChecked()));
-                return;
-            }
-
-            // Check the argument types
-            if (!args[0]->IsNumber())
-            {
-                isolate->ThrowException(Exception::TypeError(
-                    String::NewFromUtf8(isolate,
-                                        "Wrong arguments")
-                        .ToLocalChecked()));
-                return;
-            }
-
             bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(isolate);
             bool showK = args[2]->IsUndefined() ? 0 : args[2]->BooleanValue(isolate);
             int duration = (args[3]->IsUndefined() ? 0 : (int)args[3].As<Number>()->Value());
 
             // Perform the operation
-            double value = args[0].As<Number>()->Value();
+            double value = args[0]->IsUndefined() ? 0 : args[0].As<Number>()->Value();
             obj->num_ = (int)value;
 
             int number[] = {1, 2, 3, 4};
@@ -196,7 +172,7 @@ namespace display
         vector<DigitalOut *> segments;
 
         DigitalOut point;
-        int num_;
+        int num_ = 0;
     };
 
     void InitAll(Local<Object> exports)

@@ -6,6 +6,9 @@
       "libraries": [
             "-lcppgpio", "-lpthread"
       ],
+      'cflags': [
+        '-O3',
+      ],
     }
   ]
 }
