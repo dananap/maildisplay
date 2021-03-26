@@ -108,10 +108,10 @@ async function showMailCount() {
         number = 0;
     } else {
         parseDate();
-        sleep(5000).then(() => {
+        setTimeout((count_) => {
             showDate = false;
-            number = count;
-        });
+            number = count_;
+        }, 5000, count);
     }
 }
 
