@@ -180,10 +180,10 @@ namespace display
                     else
                         obj->point.off();
                     obj->digits[i]->off();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
                     obj->digits[i]->on();
-                    running = chrono::duration_cast<chrono::milliseconds> (chrono::steady_clock::now() - start);
                 }
+                running = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start);
             } while (running.count() < duration);
 
             args.GetReturnValue().SetUndefined();
