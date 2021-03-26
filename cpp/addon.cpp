@@ -138,7 +138,7 @@ namespace display
 
             bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(isolate);
             bool showK = args[2]->IsUndefined() ? 0 : args[2]->BooleanValue(isolate);
-            int duration = ((int)args[3]->NumberValue(context).FromMaybe(0));
+            int duration = ((int)args[3]->NumberValue(isolate).FromMaybe(0));
 
             // Perform the operation
             double value = args[0].As<Number>()->Value();
