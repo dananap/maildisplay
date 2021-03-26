@@ -15,6 +15,7 @@ var imap = new Imap({
     tls: false,
     autotls: 'required'
 });
+let imapConnected = false;
 
 const worker = new Worker('./worker.js');
 
@@ -25,7 +26,6 @@ bot.on('cmd', (cmd_) => {
     priceAge = moment().subtract(60, 'seconds');
 });
 
-let stop = false;
 let number = 0000;
 let time = moment(), showDate = false, showK = false;
 let priceAge = moment().subtract(60, 'seconds');
@@ -35,6 +35,7 @@ function sendData() {
 }
 
 function cleanup() {
+    imap.end();
     clearInterval(chkInterval);
     worker.postMessage(null);
 }
@@ -42,7 +43,7 @@ function cleanup() {
 
 function countUnread() {
     return new Promise((resolve, reject) => {
-        openInbox(function (err, box) {
+        imap.openBox('INBOX', true, function (err, box) {
             if (err) throw err;
             let count = 0;
             imap.search(['UNSEEN'], function (err, results) {
@@ -81,7 +82,6 @@ function countUnread() {
                     });
                     f.once('end', function () {
                         console.log('Done fetching all messages!');
-                        imap.end();
                         resolve(count);
                     });
                 } catch (err) {
@@ -93,33 +93,34 @@ function countUnread() {
     });
 }
 
-function openInbox(cb) {
-    imap.openBox('INBOX', true, cb);
-}
-
 function parseDate() {
     showDate = true;
     time.utcOffset(1);
     const min = time.minute();
     const hr = time.hour();
-    number = parseInt('' + Math.floor((hr / 10) % 10) + hr % 10 + Math.floor((min / 10) % 10) + min % 10);
+    number = parseIsynnt('' + Math.floor((hr / 10) % 10) + hr % 10 + Math.floor((min / 10) % 10) + min % 10);
 }
 
-function showMailCount() {
+async function showMailCount() {
+    if(!imapConnected) await reconnectImap();
+    const count = await countUnread();
+    if (count === 0) {
+        number = 0;
+    } else {
+        parseDate();
+        sleep(5000).then(() => {
+            showDate = false;
+            number = count;
+        });
+    }
+}
+
+function reconnectImap() {
     return new Promise((resolve) => {
         imap.connect();
         imap.once('ready', async () => {
-            const count = await countUnread();
+            imapConnected = true;
             resolve();
-            if (count === 0) {
-                number = 0;
-            } else {
-                parseDate();
-                sleep(5000).then(() => {
-                    showDate = false;
-                    number = count;
-                });
-            }
         });
     });
 }
@@ -157,13 +158,12 @@ const chkInterval = setInterval(async () => {
 }, 25000);
 
 async function main() {
+    reconnectImap();
     sendData();
 }
 
 imap.once('error', function (err) {
     console.log(err);
-    stop = true;
-    process.nextTick(cleanup);
 });
 
 imap.on('end', function () {
@@ -258,7 +258,6 @@ async function getCovidData(metric = 'new_cases', country = 'DEU') {
 
 process.on('SIGTERM', () => {
     console.info('SIGTERM signal received.');
-    stop = true;
     process.nextTick(cleanup);
 });
 
