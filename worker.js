@@ -20,10 +20,10 @@ function update(data) {
     showK = data[2] || 0;
 }
 
-async function run() {
-    const fn = async () => {
+function run() {
+    const fn = () => {
         display.show(number, showDate, showK);
-            fn();
+        setImmediate(fn);
     }
     setImmediate(fn);
 }
