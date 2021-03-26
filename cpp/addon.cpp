@@ -117,7 +117,7 @@ namespace display
             int duration = (args[3]->IsUndefined() ? 0 : (int)args[3].As<Number>()->Value());
 
             // Perform the operation
-            int value = args[0]->IsUndefined() ? 0 : (int)args[0].As<Number>()->Value();
+            int value = args[0]->IsUndefined() ? 1000 : (int)args[0].As<Number>()->Value();
 
             int number[] = {1, 2, 3, 4};
 
@@ -155,7 +155,7 @@ namespace display
                         obj->point.on();
                     else
                         obj->point.off();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(3));
                     obj->digits[i]->on();
                 }
                 running = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start);
