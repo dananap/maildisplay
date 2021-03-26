@@ -138,7 +138,7 @@ namespace display
 
             bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(isolate);
             bool showK = args[2]->IsUndefined() ? 0 : args[2]->BooleanValue(isolate);
-            std::chrono::milliseconds duration((int)args[3]->NumberValue(context).FromMaybe(0));
+            int duration = ((int)args[3]->NumberValue(context).FromMaybe(0));
 
             // Perform the operation
             double value = args[0].As<Number>()->Value();
@@ -162,7 +162,7 @@ namespace display
             }
 
             chrono::steady_clock::time_point start = chrono::steady_clock::now();
-            std::chrono::duration<int, milli> running;
+            std::chrono::milliseconds running;
             do
             {
                 for (int i = 0; i < 4; i++)
@@ -182,7 +182,7 @@ namespace display
                     obj->digits[i]->off();
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     obj->digits[i]->on();
-                    running = chrono::steady_clock::now() - start;
+                    running = chrono::duration_cast<chrono::milliseconds> (chrono::steady_clock::now() - start);
                 }
             } while (running.count() < duration);
 
