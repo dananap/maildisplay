@@ -22,9 +22,7 @@ function update(data) {
 
 function run() {
     const fn = () => {
-        console.time();
-        display.show(number, showDate, showK, 100);
-        console.timeEnd();
+        display.show(number, showDate, showK, 1000);
         setImmediate(fn);
     }
     setImmediate(fn);
