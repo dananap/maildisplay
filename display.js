@@ -111,6 +111,7 @@ async function showMailCount() {
         setTimeout((count_) => {
             showDate = false;
             number = count_;
+            sendData();
         }, 5000, count);
     }
 }
