@@ -22,7 +22,7 @@ vector<array<bool, 7>> nums = {
     {1, 1, 1, 1, 1, 1, 1},
     {1, 1, 1, 1, 0, 1, 1},
     {1, 0, 1, 0, 1, 1, 1},
-    };
+};
 
 namespace display
 {
@@ -138,6 +138,7 @@ namespace display
 
             bool showPoint = args[1]->IsUndefined() ? 0 : args[1]->BooleanValue(isolate);
             bool showK = args[2]->IsUndefined() ? 0 : args[2]->BooleanValue(isolate);
+            std::chrono::milliseconds duration((int)args[3]->NumberValue(context).FromMaybe(0));
 
             // Perform the operation
             double value = args[0].As<Number>()->Value();
@@ -145,35 +146,45 @@ namespace display
 
             int number[] = {1, 2, 3, 4};
 
-            if(showK) {
+            if (showK)
+            {
                 number[3] = 10;
                 number[2] = (int)((obj->num_ / 1000) % 10);
                 number[1] = (int)((obj->num_ / 10000) % 10);
                 number[0] = (int)((obj->num_ / 100000) % 10);
-            } else {
+            }
+            else
+            {
                 number[3] = (int)obj->num_ % 10;
                 number[2] = (int)((obj->num_ / 10) % 10);
                 number[1] = (int)((obj->num_ / 100) % 10);
                 number[0] = (int)((obj->num_ / 1000) % 10);
             }
-            for (int i = 0; i < 4; i++)
+
+            chrono::steady_clock::time_point start = chrono::steady_clock::now();
+            std::chrono::duration<int, milli> running;
+            do
             {
-                // proms.push(digits[i].write(0));
-                for (int j = 0; j < 7; j++)
+                for (int i = 0; i < 4; i++)
                 {
-                    if (nums[number[i]][j])
-                        obj->segments[j]->on();
+                    // proms.push(digits[i].write(0));
+                    for (int j = 0; j < 7; j++)
+                    {
+                        if (nums[number[i]][j])
+                            obj->segments[j]->on();
+                        else
+                            obj->segments[j]->off();
+                    }
+                    if (showPoint)
+                        obj->point.on();
                     else
-                        obj->segments[j]->off();
+                        obj->point.off();
+                    obj->digits[i]->off();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    obj->digits[i]->on();
+                    running = chrono::steady_clock::now() - start;
                 }
-                if (showPoint)
-                    obj->point.on();
-                else
-                    obj->point.off();
-                obj->digits[i]->off();
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                obj->digits[i]->on();
-            }
+            } while (running.count() < duration);
 
             args.GetReturnValue().SetUndefined();
         }
