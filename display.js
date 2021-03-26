@@ -17,6 +17,7 @@ var imap = new Imap({
 });
 let imapConnected = false;
 
+const workerData = new SharedArrayBuffer(4);
 const worker = new Worker('./worker.js');
 
 const bot = new Bot();
@@ -31,7 +32,10 @@ let time = moment(), showDate = false, showK = false;
 let priceAge = moment().subtract(60, 'seconds');
 
 function sendData() {
-    worker.postMessage([number, showDate, showK]);
+    var dataView = new DataView(workerData);
+    dataView.setUint16(0, number);
+    dataView.setUint8(2, showDate);
+    dataView.setUint8(3, showK);
 }
 
 function cleanup() {
@@ -160,7 +164,7 @@ const chkInterval = setInterval(async () => {
 
 async function main() {
     reconnectImap();
-    sendData();
+    worker.postMessage({workerData});
 }
 
 imap.once('error', function (err) {

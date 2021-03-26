@@ -4,26 +4,23 @@ const {
 const Display = require('./cpp/build/Release/display').Display;
 
 const display = new Display(1234);
-let number = 0000, showDate = false,  showK = false;
+let number = 0000, showDate = false, showK = false, workerData, dataView;
 
 parentPort.once('message', (data) => {
-    update(data);
-    run();
-    parentPort.on('message', (data) => {
-        update(data);       
-    });
-});
-
-function update(data) {
-    number = data[0];
-    showDate = data[1] || 0;
-    showK = data[2] || 0;
-}
-
-function run() {
+    workerData = data.workerData;
+    dataView = new DataView(workerData);
+    update();
+    fn();
     const fn = () => {
         display.show(number, showDate, showK, 1000);
+        update();
         setImmediate(fn);
     }
-    setImmediate(fn);
+});
+
+function update() {
+    number = dataView.getUint16(0);
+    showDate = dataView.getUint8(2) != 0;
+    showK = dataView.getUint8(3) != 0;
 }
+
