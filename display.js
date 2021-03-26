@@ -98,7 +98,7 @@ function parseDate() {
     time.utcOffset(1);
     const min = time.minute();
     const hr = time.hour();
-    number = parseIsynnt('' + Math.floor((hr / 10) % 10) + hr % 10 + Math.floor((min / 10) % 10) + min % 10);
+    number = parseInt('' + Math.floor((hr / 10) % 10) + hr % 10 + Math.floor((min / 10) % 10) + min % 10);
 }
 
 async function showMailCount() {
