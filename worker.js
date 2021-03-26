@@ -3,19 +3,16 @@ const {
 } = require('worker_threads');
 const Display = require('./cpp/build/Release/display').Display;
 
-const display = new Display(0000);
+const display = new Display();
 let number = 0000, showDate = false, showK = false, workerData, dataView;
 
 parentPort.once('message', (data) => {
     workerData = data.workerData;
     dataView = new DataView(workerData);
-    setInterval(update, 5000);
-    update();
-    const fn = () => {
+    while (1) {
+        update();
         display.show(number, showDate, showK, 5000);
-        setImmediate(fn);
     }
-    fn();
 });
 
 function update() {

@@ -117,24 +117,23 @@ namespace display
             int duration = (args[3]->IsUndefined() ? 0 : (int)args[3].As<Number>()->Value());
 
             // Perform the operation
-            double value = args[0]->IsUndefined() ? 0 : args[0].As<Number>()->Value();
-            obj->num_ = (int)value;
+            int value = args[0]->IsUndefined() ? 0 : (int)args[0].As<Number>()->Value();
 
             int number[] = {1, 2, 3, 4};
 
             if (showK)
             {
                 number[3] = 10;
-                number[2] = (int)((obj->num_ / 1000) % 10);
-                number[1] = (int)((obj->num_ / 10000) % 10);
-                number[0] = (int)((obj->num_ / 100000) % 10);
+                number[2] = (int)((value / 1000) % 10);
+                number[1] = (int)((value / 10000) % 10);
+                number[0] = (int)((value / 100000) % 10);
             }
             else
             {
-                number[3] = (int)obj->num_ % 10;
-                number[2] = (int)((obj->num_ / 10) % 10);
-                number[1] = (int)((obj->num_ / 100) % 10);
-                number[0] = (int)((obj->num_ / 1000) % 10);
+                number[3] = (int)value % 10;
+                number[2] = (int)((value / 10) % 10);
+                number[1] = (int)((value / 100) % 10);
+                number[0] = (int)((value / 1000) % 10);
             }
 
             chrono::steady_clock::time_point start = chrono::steady_clock::now();
@@ -151,11 +150,11 @@ namespace display
                         else
                             obj->segments[j]->off();
                     }
+                    obj->digits[i]->off();
                     if (showPoint)
                         obj->point.on();
                     else
                         obj->point.off();
-                    obj->digits[i]->off();
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     obj->digits[i]->on();
                 }
@@ -172,7 +171,6 @@ namespace display
         vector<DigitalOut *> segments;
 
         DigitalOut point;
-        int num_ = 0;
     };
 
     void InitAll(Local<Object> exports)
