@@ -4,7 +4,6 @@
 #include <array>
 #include <algorithm>
 #include <functional>
-#include <node/node.h>
 
 using namespace GPIO;
 using namespace std;
@@ -23,16 +22,15 @@ vector<array<bool, 7>> num = {
 
 int main()
 {
-    v8
     array<int, 4> Digits = {22, 27, 17, 24};
-    vector<DigitalOut*> digits;
+    vector<DigitalOut *> digits;
 
     array<int, 7> Segments = {11, 4, 23, 8, 7, 10, 18};
-    vector<DigitalOut*> segments;
+    vector<DigitalOut *> segments;
 
     for (int i = 0; i < Digits.size(); i++)
     {
-        digits.push_back(new DigitalOut (Digits[i]));
+        digits.push_back(new DigitalOut(Digits[i]));
         digits[i]->off();
     }
     for (int i = 0; i < Segments.size(); i++)
@@ -56,7 +54,9 @@ int main()
     int n[] = {1, 2, 3, 4};
     bool stop = false;
 
-    while (!stop)
+    chrono::steady_clock::time_point start = chrono::steady_clock::now();
+    std::chrono::milliseconds running;
+    do
     {
         for (int i = 0; i < 4; i++)
         {
@@ -72,7 +72,8 @@ int main()
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             digits[i]->on();
         }
-    }
+        running = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start);
+    } while (running.count() < 5000);
 
     return 0;
 }
