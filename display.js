@@ -37,7 +37,7 @@ function sendData() {
 function cleanup() {
     imap.end();
     clearInterval(chkInterval);
-    worker.postMessage(null);
+    worker.terminate();
 }
 
 
