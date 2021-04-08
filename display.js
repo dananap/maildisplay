@@ -30,11 +30,12 @@ let time = moment(),
     showDate = false,
     showK = false;
 let priceAge = moment().subtract(60, 'seconds');
+let cmd = ['mails'];
 
 class Status extends EventEmitter {
     constructor() {
         super();
-        this.text = '';
+        this.text = cmd.join(' ');
     }
 
     set mode(val) {
@@ -51,7 +52,6 @@ class Status extends EventEmitter {
 const status = new Status();
 
 const bot = new Bot(status);
-let cmd = ['mails'];
 bot.on('cmd', (cmd_) => {
     cmd = cmd_.split(' ');
     priceAge = moment().subtract(60, 'seconds');
