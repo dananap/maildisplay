@@ -6,8 +6,8 @@ const api = axios.create({
 });
 const redis = require("redis");
 const client = redis.createClient({
-    host: '192.168.5.1',
-    password: 'x26hpNEsELJS'
+    // host: '192.168.5.1',
+    // password: 'x26hpNEsELJS'
 });
 const { promisify } = require("util");
 const getAsync = promisify(client.get).bind(client);
