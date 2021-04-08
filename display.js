@@ -34,13 +34,14 @@ let priceAge = moment().subtract(60, 'seconds');
 class Status extends EventEmitter {
     constructor() {
         super();
-        this.mode = '';
+        this.text = '';
     }
 
     set mode(val) {
-        if (this.mode !== val) {
+        if (this.text !== val.join(' ')) {
+            this.text = val.join(' ');
             this.emit('mode', {
-                text: val,
+                text: val.join(' '),
                 number,
             });
         }
@@ -200,7 +201,7 @@ const chkInterval = setInterval(async () => {
             break;
     }
     sendData();
-    status.mode = cmd.join(' ');
+    status.mode = cmd;
 }, 25000);
 
 async function main() {
