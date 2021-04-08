@@ -11,6 +11,7 @@ const {
     parentPort,
 } = require('worker_threads');
 const { EventEmitter } = require('events');
+const logger = require('./logger');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -72,12 +73,14 @@ function cleanup() {
 
 function countUnread() {
     return new Promise((resolve, reject) => {
+        logger.info('Fetching IMAP messages');
+
         imap.openBox('INBOX', true, function (err, box) {
             if (err) throw err;
             let count = 0;
             imap.search(['UNSEEN'], function (err, results) {
                 if (err) {
-                    console.error(err);
+                    logger.error(err);
                     return resolve(0);
                 }
                 try {
@@ -87,40 +90,34 @@ function countUnread() {
                     });
                     f.on('message', function (msg, seqno) {
                         count++;
-                        console.log('Message #%d', seqno);
-                        var prefix = '(#' + seqno + ') ';
+                        logger.verbose("IMAP Message", {seqno});
                         msg.on('body', function (stream, info) {
                             var buffer = '';
                             stream.on('data', function (chunk) {
                                 buffer += chunk.toString('utf8');
                             });
                             stream.once('end', function () {
-                                console.log(
-                                    prefix + 'Parsed header: %s',
-                                    inspect(Imap.parseHeader(buffer))
-                                );
+                                logger.verbose("IMAP parsed header", {seqno, header: Imap.parseHeader(buffer)});
                             });
                         });
                         msg.once('attributes', function (attrs) {
-                            console.log(
-                                prefix + 'Attributes: %s',
-                                inspect(attrs, false, 8)
-                            );
+                            logger.verbose("IMAP attributes", {seqno, attrs});
+
                             time = moment(attrs.date);
                         });
                         msg.once('end', function () {
-                            console.log(prefix + 'Finished');
+                            logger.verbose("IMAP finished", {seqno});
                         });
                     });
                     f.once('error', function (err) {
-                        console.log('Fetch error: ' + err);
+                        logger.error('IMAP Fetch error', {err});
                     });
                     f.once('end', function () {
-                        console.log('Done fetching all messages!');
+                        logger.info('Done fetching all messages');
                         resolve(count);
                     });
                 } catch (err) {
-                    console.error(err);
+                    logger.error('IMAP error', {err});
                     return resolve(0);
                 }
             });
@@ -166,6 +163,7 @@ function reconnectImap() {
         imap.connect();
         imap.once('ready', async () => {
             imapConnected = true;
+            logger.info('IMAP connected');
             resolve();
         });
     });
@@ -210,11 +208,11 @@ async function main() {
 }
 
 imap.once('error', function (err) {
-    console.log(err);
+    logger.error('IMAP error', {err});
 });
 
 imap.on('end', function () {
-    console.log('Connection ended');
+    logger.info('IMAP connection ended');
 });
 
 function sleep(ms) {
@@ -309,7 +307,7 @@ async function getCovidData(metric = 'new_cases', country = 'DEU') {
 }
 
 process.on('SIGTERM', () => {
-    console.info('SIGTERM signal received.');
+    logger.info('SIGTERM signal received');
     process.nextTick(cleanup);
 });
 

@@ -14,9 +14,10 @@ const getAsync = promisify(client.get).bind(client);
 const setAsync = promisify(client.set).bind(client);
 const lindex = promisify(client.lindex).bind(client);
 const {EventEmitter} = require('events');
+const logger = require('./logger');
 
 client.on("error", function (error) {
-    console.error(error);
+    logger.error('Redis error', {error});
 });
 
 class Bot extends EventEmitter {
@@ -51,7 +52,8 @@ class Bot extends EventEmitter {
             client.lpush('tg.updates', JSON.stringify(u));
             if(u.message) {
                 const {text, from} = u.message;
-                console.log({text, from});
+                logger.verbose("telegram update", u);
+                logger.info("telegram message", {text, from: from.username})
                 this.emit('cmd', text);
             }
         }
