@@ -4,9 +4,13 @@ const moment = require('moment');
 const axios = require('axios').default;
 const Bot = require('./tg-bot');
 const {
-    Worker, MessageChannel, MessagePort, isMainThread, parentPort
+    Worker,
+    MessageChannel,
+    MessagePort,
+    isMainThread,
+    parentPort,
 } = require('worker_threads');
-const {EventEmitter} = require('events');
+const { EventEmitter } = require('events');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -14,7 +18,7 @@ var imap = new Imap({
     host: 'mail.dpulm.online',
     port: 143,
     tls: false,
-    autotls: 'required'
+    autotls: 'required',
 });
 let imapConnected = false;
 
@@ -22,20 +26,24 @@ const workerData = new SharedArrayBuffer(4);
 const worker = new Worker('./worker.js');
 
 let number = 0000;
-let time = moment(), showDate = false, showK = false;
+let time = moment(),
+    showDate = false,
+    showK = false;
 let priceAge = moment().subtract(60, 'seconds');
 
 class Status extends EventEmitter {
     constructor() {
         super();
-        this.mode = "";
+        this.mode = '';
     }
 
     set mode(val) {
-        this.emit("mode", {
-            text: val,
-            number
-        });
+        if (this.mode !== val) {
+            this.emit('mode', {
+                text: val,
+                number,
+            });
+        }
     }
 }
 
@@ -61,7 +69,6 @@ function cleanup() {
     worker.terminate();
 }
 
-
 function countUnread() {
     return new Promise((resolve, reject) => {
         imap.openBox('INBOX', true, function (err, box) {
@@ -75,7 +82,7 @@ function countUnread() {
                 try {
                     var f = imap.fetch(results, {
                         bodies: 'HEADER.FIELDS (DATE)',
-                        struct: false
+                        struct: false,
                     });
                     f.on('message', function (msg, seqno) {
                         count++;
@@ -87,12 +94,18 @@ function countUnread() {
                                 buffer += chunk.toString('utf8');
                             });
                             stream.once('end', function () {
-                                console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+                                console.log(
+                                    prefix + 'Parsed header: %s',
+                                    inspect(Imap.parseHeader(buffer))
+                                );
                             });
                         });
                         msg.once('attributes', function (attrs) {
-                            console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
-                            time = moment(attrs.date)
+                            console.log(
+                                prefix + 'Attributes: %s',
+                                inspect(attrs, false, 8)
+                            );
+                            time = moment(attrs.date);
                         });
                         msg.once('end', function () {
                             console.log(prefix + 'Finished');
@@ -119,21 +132,31 @@ function parseDate() {
     time.utcOffset(1);
     const min = time.minute();
     const hr = time.hour();
-    number = parseInt('' + Math.floor((hr / 10) % 10) + hr % 10 + Math.floor((min / 10) % 10) + min % 10);
+    number = parseInt(
+        '' +
+            Math.floor((hr / 10) % 10) +
+            (hr % 10) +
+            Math.floor((min / 10) % 10) +
+            (min % 10)
+    );
 }
 
 async function showMailCount() {
-    if(!imapConnected) await reconnectImap();
+    if (!imapConnected) await reconnectImap();
     const count = await countUnread();
     if (count === 0) {
         number = 0;
     } else {
         parseDate();
-        setTimeout((count_) => {
-            showDate = false;
-            number = count_;
-            sendData();
-        }, 5000, count);
+        setTimeout(
+            (count_) => {
+                showDate = false;
+                number = count_;
+                sendData();
+            },
+            5000,
+            count
+        );
     }
 }
 
@@ -177,12 +200,12 @@ const chkInterval = setInterval(async () => {
             break;
     }
     sendData();
-    status.mode = cmd.join(" ");
+    status.mode = cmd.join(' ');
 }, 25000);
 
 async function main() {
     reconnectImap();
-    worker.postMessage({workerData});
+    worker.postMessage({ workerData });
 }
 
 imap.once('error', function (err) {
@@ -200,12 +223,15 @@ function sleep(ms) {
 }
 
 async function getCryptoPrice(id = 'ethereum') {
-    const { data } = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
-        params: {
-            vs_currencies: 'eur',
-            ids: id
+    const { data } = await axios.get(
+        'https://api.coingecko.com/api/v3/simple/price',
+        {
+            params: {
+                vs_currencies: 'eur',
+                ids: id,
+            },
         }
-    });
+    );
     return data[id].eur;
 }
 
@@ -216,8 +242,8 @@ async function getIntradayData(symbol) {
             symbol,
             apikey: '3IFWTOJ46GQ5DIWR',
             // outputsize: "full",
-            interval: '1min'
-        }
+            interval: '1min',
+        },
     });
 
     const timeSeries = Object.values(req.data)[1];
@@ -233,7 +259,7 @@ async function getIntradayData(symbol) {
             close: parseFloat(values[3]),
             volume: parseFloat(values[4]),
             symbol,
-        }
+        };
         timeArray.push(entry);
     }
 
@@ -247,8 +273,8 @@ async function getCovidData(metric = '') {
             symbol,
             apikey: '3IFWTOJ46GQ5DIWR',
             // outputsize: "full",
-            interval: '1min'
-        }
+            interval: '1min',
+        },
     });
 
     const timeSeries = Object.values(req.data)[1];
@@ -264,7 +290,7 @@ async function getCovidData(metric = '') {
             close: parseFloat(values[3]),
             volume: parseFloat(values[4]),
             symbol,
-        }
+        };
         timeArray.push(entry);
     }
 
@@ -272,7 +298,9 @@ async function getCovidData(metric = '') {
 }
 
 async function getCovidData(metric = 'new_cases', country = 'DEU') {
-    const req = await axios.get('https://github.com/owid/covid-19-data/raw/master/public/data/latest/owid-covid-latest.json');
+    const req = await axios.get(
+        'https://github.com/owid/covid-19-data/raw/master/public/data/latest/owid-covid-latest.json'
+    );
 
     const metrics = req.data[country];
 
