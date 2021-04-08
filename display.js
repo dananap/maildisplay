@@ -28,7 +28,6 @@ class Status extends EventEmitter {
     }
 
     set mode(val) {
-        this.mode = val;
         this.emit("mode", {
             text: val,
             number
