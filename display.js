@@ -6,6 +6,7 @@ const Bot = require('./tg-bot');
 const {
     Worker, MessageChannel, MessagePort, isMainThread, parentPort
 } = require('worker_threads');
+const {EventEmitter} = require('events');
 
 var imap = new Imap({
     user: 'daniel@dpulm.online',
@@ -20,7 +21,24 @@ let imapConnected = false;
 const workerData = new SharedArrayBuffer(4);
 const worker = new Worker('./worker.js');
 
-const bot = new Bot();
+class Status extends EventEmitter {
+    constructor() {
+        super();
+        this.mode = "";
+    }
+
+    set mode(val) {
+        this.mode = val;
+        this.emit("mode", {
+            text: val,
+            number
+        });
+    }
+}
+
+const status = new Status();
+
+const bot = new Bot(status);
 let cmd = ['mails'];
 bot.on('cmd', (cmd_) => {
     cmd = cmd_.split(' ');
@@ -160,6 +178,7 @@ const chkInterval = setInterval(async () => {
             break;
     }
     sendData();
+    status.mode = cmd.join(" ");
 }, 25000);
 
 async function main() {

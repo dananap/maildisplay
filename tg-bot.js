@@ -12,6 +12,7 @@ const client = redis.createClient({
 const { promisify } = require("util");
 const getAsync = promisify(client.get).bind(client);
 const setAsync = promisify(client.set).bind(client);
+const lindex = promisify(client.lindex).bind(client);
 const {EventEmitter} = require('events');
 
 client.on("error", function (error) {
@@ -19,10 +20,18 @@ client.on("error", function (error) {
 });
 
 class Bot extends EventEmitter {
-    constructor(time = 5000) {
+    constructor(status, time = 5000) {
         super();
         this.time = time;
         this.timeout = setInterval(async () => {await this.getUpdates()}, time);
+        this.status = status;
+
+        this.status.on('mode', async (mode) => {
+            const update = JSON.parse(await lindex('tg.updates', -1));
+            const chat_id = update.from.id;
+            await this.sendMessage(chat_id, "Mode: " + mode.text + "\nNumber: " + mode.number);
+        });
+        
     }
 
     async getUpdates() {
@@ -48,6 +57,16 @@ class Bot extends EventEmitter {
         // this.timeout = setTimeout(this.getUpdates, this.time);
     }
 
+    async sendMessage(chat_id, text) {
+    
+        const res = await api('/sendMessage', {
+            params: {
+                chat_id,
+                text
+            }
+        });
+        return res;
+    }
 }
 
 module.exports = Bot;
