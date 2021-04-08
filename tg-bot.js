@@ -29,7 +29,9 @@ class Bot extends EventEmitter {
         this.status.on('mode', async (mode) => {
             const update = JSON.parse(await lindex('tg.updates', -1));
             const chat_id = update.message.from.id;
-            await this.sendMessage(chat_id, "Mode: " + mode.text + "\nNumber: " + mode.number);
+            const msg_id = update.message.message_id;
+            const text = "*Mode:* " + mode.text + "\n*Number:* `" + mode.number + "`";
+            await this.sendMessage(chat_id, text, msg_id);
         });
         
     }
@@ -57,12 +59,14 @@ class Bot extends EventEmitter {
         // this.timeout = setTimeout(this.getUpdates, this.time);
     }
 
-    async sendMessage(chat_id, text) {
+    async sendMessage(chat_id, text, reply_to_message_id) {
     
         const res = await api('/sendMessage', {
             params: {
                 chat_id,
-                text
+                text,
+                reply_to_message_id,
+                parse_mode: "MarkdownV2"
             }
         });
         return res;
