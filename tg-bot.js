@@ -5,7 +5,9 @@ const api = axios.create({
     method: 'GET'
 });
 const redis = require("redis");
-const client = redis.createClient();
+const client = redis.createClient({
+    host: '192.168.5.1'
+});
 const { promisify } = require("util");
 const getAsync = promisify(client.get).bind(client);
 const setAsync = promisify(client.set).bind(client);
