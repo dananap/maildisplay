@@ -21,6 +21,17 @@ let imapConnected = false;
 const workerData = new SharedArrayBuffer(4);
 const worker = new Worker('./worker.js');
 
+const bot = new Bot(status);
+let cmd = ['mails'];
+bot.on('cmd', (cmd_) => {
+    cmd = cmd_.split(' ');
+    priceAge = moment().subtract(60, 'seconds');
+});
+
+let number = 0000;
+let time = moment(), showDate = false, showK = false;
+let priceAge = moment().subtract(60, 'seconds');
+
 class Status extends EventEmitter {
     constructor() {
         super();
@@ -36,17 +47,6 @@ class Status extends EventEmitter {
 }
 
 const status = new Status();
-
-const bot = new Bot(status);
-let cmd = ['mails'];
-bot.on('cmd', (cmd_) => {
-    cmd = cmd_.split(' ');
-    priceAge = moment().subtract(60, 'seconds');
-});
-
-let number = 0000;
-let time = moment(), showDate = false, showK = false;
-let priceAge = moment().subtract(60, 'seconds');
 
 function sendData() {
     var dataView = new DataView(workerData);
