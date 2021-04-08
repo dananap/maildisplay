@@ -27,7 +27,7 @@ class Bot extends EventEmitter {
         this.status = status;
 
         this.status.on('mode', async (mode) => {
-            const update = JSON.parse(await lindex('tg.updates', -1));
+            const update = JSON.parse(await lindex('tg.updates', 0));
             const chat_id = update.message.from.id;
             const msg_id = update.message.message_id;
             const text = "*Mode:* " + mode.text + "\n*Number:* `" + mode.number + "`";
