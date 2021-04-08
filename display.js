@@ -127,7 +127,7 @@ function countUnread() {
 
 function parseDate() {
     showDate = true;
-    time.utcOffset(1);
+    time.utcOffset(2);
     const min = time.minute();
     const hr = time.hour();
     number = parseInt(
