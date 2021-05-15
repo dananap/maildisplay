@@ -40,7 +40,7 @@ class Bot extends EventEmitter {
             const chat_id = update.message.from.id;
             const msg_id = update.message.message_id;
             let text = "*Mode:* " + mode.text + "\n*Number:* `" + mode.number + "`";
-            if(mode.table) text += '\n\n' + mode.table;
+            // if(mode.table) text += '\n\n' + mode.table;
             await this.sendMessage(chat_id, text, msg_id);
         });
 
@@ -50,7 +50,7 @@ class Bot extends EventEmitter {
         const update = JSON.parse(await lindex('tg.updates', 0));
         const chat_id = update.message.from.id;
         const msg_id = update.message.message_id;
-        await this.sendMessage(chat_id, text, msg_id);
+        await this.sendMessage(chat_id, text, msg_id, "HTML");
     }
 
     async getUpdates() {
@@ -85,14 +85,14 @@ class Bot extends EventEmitter {
         // this.timeout = setTimeout(this.getUpdates, this.time);
     }
 
-    async sendMessage(chat_id, text, reply_to_message_id) {
+    async sendMessage(chat_id, text, reply_to_message_id, parse_mode = "MarkdownV2") {
         let res;
         try {
             res = await api.post('/sendMessage', {
                 chat_id,
                 text,
                 reply_to_message_id,
-                parse_mode: "MarkdownV2"
+                parse_mode
             });
             logger.info("sent telegram message", {
                 chat_id,
