@@ -43,13 +43,14 @@ class Status extends EventEmitter {
 
     set mode(val) {
         if (this.text !== val.join(' ')) {
-            this.table = null;
             this.text = val.join(' ');
             this.emit('mode', {
                 text: val.join(' '),
                 number,
                 table: this.table
             });
+            this.table = null;
+
         }
     }
 }
