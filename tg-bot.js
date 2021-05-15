@@ -87,8 +87,8 @@ class Bot extends EventEmitter {
     async sendMessage(chat_id, text, reply_to_message_id) {
         let res;
         try {
-            res = await api('/sendMessage', {
-                params: {
+            res = await api.post('/sendMessage', {
+                data: {
                     chat_id,
                     text,
                     reply_to_message_id,
