@@ -109,6 +109,7 @@ class Bot extends EventEmitter {
                 e,
                 res
             });
+            console.dir(res);
         }
 
     }
