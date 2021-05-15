@@ -9,10 +9,10 @@ let number = 0000, showDate = false, showK = false, workerData, dataView;
 parentPort.once('message', (data) => {
     workerData = data.workerData;
     dataView = new DataView(workerData);
-    while (1) {
+    process.nextTick(() => {
         update();
         display.show(number, showDate, showK, 5000);
-    }
+    });
 });
 
 function update() {
