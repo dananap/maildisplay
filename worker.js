@@ -9,7 +9,7 @@ let number = 0000, showDate = false, showK = false, workerData, dataView;
 parentPort.once('message', (data) => {
     workerData = data.workerData;
     dataView = new DataView(workerData);
-    process.nextTick(() => {
+    setImmediate(() => {
         update();
         display.show(number, showDate, showK, 5000);
     });
