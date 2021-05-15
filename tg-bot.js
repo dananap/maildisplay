@@ -85,18 +85,26 @@ class Bot extends EventEmitter {
     }
 
     async sendMessage(chat_id, text, reply_to_message_id) {
-        const res = await api('/sendMessage', {
-            params: {
+        try {
+            const res = await api('/sendMessage', {
+                params: {
+                    chat_id,
+                    text,
+                    reply_to_message_id,
+                    parse_mode: "MarkdownV2"
+                }
+            });
+            logger.info("sent telegram message", {
+                chat_id,
+                text
+            });
+        } catch (e) {
+            logger.error('telegram message error', {
                 chat_id,
                 text,
-                reply_to_message_id,
-                parse_mode: "MarkdownV2"
-            }
-        });
-        logger.info("sent telegram message", {
-            chat_id,
-            text
-        });
+                e
+            });
+        }
 
         return res;
     }
