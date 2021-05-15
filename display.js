@@ -204,7 +204,7 @@ const chkInterval = setInterval(async () => {
             number = Math.floor(await getCryptoTotal());
             showK = false;
             priceAge = moment();
-            bot.replyRecent(await getCryptoTable());
+            setTimeout(async () => await bot.replyRecent(await getCryptoTable()), 100);
             break;
         case 'covid':
             if (moment().diff(priceAge, 'seconds') < 60) break;
