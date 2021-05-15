@@ -159,7 +159,7 @@ namespace display
                     obj->digits[i]->on();
                 }
                 running = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start);
-            } while (running.count() < duration);
+            } while (running.count() <= duration);
 
             args.GetReturnValue().SetUndefined();
         }

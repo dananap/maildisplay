@@ -10,7 +10,9 @@ const {
     isMainThread,
     parentPort,
 } = require('worker_threads');
-const { EventEmitter } = require('events');
+const {
+    EventEmitter
+} = require('events');
 const logger = require('./logger');
 
 var imap = new Imap({
@@ -90,34 +92,48 @@ function countUnread() {
                     });
                     f.on('message', function (msg, seqno) {
                         count++;
-                        logger.verbose("IMAP Message", {seqno});
+                        logger.verbose("IMAP Message", {
+                            seqno
+                        });
                         msg.on('body', function (stream, info) {
                             var buffer = '';
                             stream.on('data', function (chunk) {
                                 buffer += chunk.toString('utf8');
                             });
                             stream.once('end', function () {
-                                logger.verbose("IMAP parsed header", {seqno, header: Imap.parseHeader(buffer)});
+                                logger.verbose("IMAP parsed header", {
+                                    seqno,
+                                    header: Imap.parseHeader(buffer)
+                                });
                             });
                         });
                         msg.once('attributes', function (attrs) {
-                            logger.verbose("IMAP attributes", {seqno, attrs});
+                            logger.verbose("IMAP attributes", {
+                                seqno,
+                                attrs
+                            });
 
                             time = moment(attrs.date);
                         });
                         msg.once('end', function () {
-                            logger.verbose("IMAP finished", {seqno});
+                            logger.verbose("IMAP finished", {
+                                seqno
+                            });
                         });
                     });
                     f.once('error', function (err) {
-                        logger.error('IMAP Fetch error', {err});
+                        logger.error('IMAP Fetch error', {
+                            err
+                        });
                     });
                     f.once('end', function () {
                         logger.info('Done fetching all messages');
                         resolve(count);
                     });
                 } catch (err) {
-                    logger.error('IMAP error', {err});
+                    logger.error('IMAP error', {
+                        err
+                    });
                     return resolve(0);
                 }
             });
@@ -132,10 +148,10 @@ function parseDate() {
     const hr = time.hour();
     number = parseInt(
         '' +
-            Math.floor((hr / 10) % 10) +
-            (hr % 10) +
-            Math.floor((min / 10) % 10) +
-            (min % 10)
+        Math.floor((hr / 10) % 10) +
+        (hr % 10) +
+        Math.floor((min / 10) % 10) +
+        (min % 10)
     );
 }
 
@@ -183,6 +199,12 @@ const chkInterval = setInterval(async () => {
             showK = false;
             priceAge = moment();
             break;
+        case 'portfolio':
+            if (moment().diff(priceAge, 'seconds') < 60) break;
+            number = Math.floor(await getCryptoTotal());
+            showK = false;
+            priceAge = moment();
+            break;
         case 'covid':
             if (moment().diff(priceAge, 'seconds') < 60) break;
             number = Math.floor(await getCovidData(cmd[1], cmd[2]));
@@ -204,11 +226,15 @@ const chkInterval = setInterval(async () => {
 
 async function main() {
     reconnectImap();
-    worker.postMessage({ workerData });
+    worker.postMessage({
+        workerData
+    });
 }
 
 imap.once('error', function (err) {
-    logger.error('IMAP error', {err});
+    logger.error('IMAP error', {
+        err
+    });
 });
 
 imap.on('end', function () {
@@ -222,9 +248,10 @@ function sleep(ms) {
 }
 
 async function getCryptoPrice(id = 'ethereum') {
-    const { data } = await axios.get(
-        'https://api.coingecko.com/api/v3/simple/price',
-        {
+    const {
+        data
+    } = await axios.get(
+        'https://api.coingecko.com/api/v3/simple/price', {
             params: {
                 vs_currencies: 'eur',
                 ids: id,
@@ -304,6 +331,18 @@ async function getCovidData(metric = 'new_cases', country = 'DEU') {
     const metrics = req.data[country];
 
     return metrics[metric];
+}
+
+async function getCryptoTotal() {
+    const req = await axios.get(
+        'http://dpulm.online:6973/data'
+    );
+
+    const {
+        total
+    } = req.data;
+
+    return total;
 }
 
 process.on('SIGTERM', () => {
