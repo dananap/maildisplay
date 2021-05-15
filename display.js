@@ -57,6 +57,7 @@ const status = new Status();
 const bot = new Bot(status);
 bot.on('cmd', (cmd_) => {
     cmd = cmd_.split(' ');
+    cmd[0] = cmd[0].slice(1);
     priceAge = moment().subtract(60, 'seconds');
 });
 
