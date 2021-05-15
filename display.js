@@ -43,10 +43,12 @@ class Status extends EventEmitter {
 
     set mode(val) {
         if (this.text !== val.join(' ')) {
+            this.table = null;
             this.text = val.join(' ');
             this.emit('mode', {
                 text: val.join(' '),
                 number,
+                table: this.table
             });
         }
     }
@@ -205,7 +207,7 @@ const chkInterval = setInterval(async () => {
             number = Math.floor(await getCryptoTotal());
             showK = false;
             priceAge = moment();
-            setTimeout(async () => await bot.replyRecent(await getCryptoTable()), 100);
+            status.table = await getCryptoTable();
             break;
         case 'covid':
             if (moment().diff(priceAge, 'seconds') < 60) break;

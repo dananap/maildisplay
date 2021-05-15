@@ -40,6 +40,7 @@ class Bot extends EventEmitter {
             const chat_id = update.message.from.id;
             const msg_id = update.message.message_id;
             const text = "*Mode:* " + mode.text + "\n*Number:* `" + mode.number + "`";
+            if(mode.table) text += '\n\n' + mode.table;
             await this.sendMessage(chat_id, text, msg_id);
         });
 
