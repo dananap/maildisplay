@@ -204,6 +204,7 @@ const chkInterval = setInterval(async () => {
             number = Math.floor(await getCryptoTotal());
             showK = false;
             priceAge = moment();
+            bot.replyRecent(await getCryptoTable());
             break;
         case 'covid':
             if (moment().diff(priceAge, 'seconds') < 60) break;
@@ -343,6 +344,18 @@ async function getCryptoTotal() {
     } = req.data;
 
     return total;
+}
+
+async function getCryptoTable() {
+    const req = await axios.get(
+        'http://dpulm.online:6973/table'
+    );
+
+    const {
+        data
+    } = req;
+
+    return data;
 }
 
 process.on('SIGTERM', () => {
