@@ -85,8 +85,9 @@ class Bot extends EventEmitter {
     }
 
     async sendMessage(chat_id, text, reply_to_message_id) {
+        let res;
         try {
-            const res = await api('/sendMessage', {
+            res = await api('/sendMessage', {
                 params: {
                     chat_id,
                     text,
@@ -98,15 +99,17 @@ class Bot extends EventEmitter {
                 chat_id,
                 text
             });
+            return res;
+
         } catch (e) {
             logger.error('telegram message error', {
                 chat_id,
                 text,
-                e
+                e,
+                res
             });
         }
 
-        return res;
     }
 }
 
