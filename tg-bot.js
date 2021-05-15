@@ -39,7 +39,7 @@ class Bot extends EventEmitter {
             const update = JSON.parse(await lindex('tg.updates', 0));
             const chat_id = update.message.from.id;
             const msg_id = update.message.message_id;
-            const text = "*Mode:* " + mode.text + "\n*Number:* `" + mode.number + "`";
+            let text = "*Mode:* " + mode.text + "\n*Number:* `" + mode.number + "`";
             if(mode.table) text += '\n\n' + mode.table;
             await this.sendMessage(chat_id, text, msg_id);
         });
